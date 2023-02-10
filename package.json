@@ -1,0 +1,24 @@
+{
+  "name": "sdmx-json-parser",
+  "version": "1.0.0",
+  "description": "A SDMX-JSON parser written in JavaScript to be executed in a browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PacificCommunity/sdmx-json-parser.git"
+  },
+  "keywords": [
+    "SDMX",
+    "JSON",
+    "parser"
+  ],
+  "author": "SPC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PacificCommunity/sdmx-json-parser/issues"
+  },
+  "homepage": "https://github.com/PacificCommunity/sdmx-json-parser#readme"
+}
