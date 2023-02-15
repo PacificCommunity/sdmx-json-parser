@@ -10,12 +10,18 @@ SDMX-JSON-parser provides a set of utility function to parse a SDMX-JSON message
 
 ```javascript
 import {  } from SDMXParser
-const sdmxUrl = "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions";
-sdmx = SDMXParser.parse(sdmxUrl, {
+const sdmxDataUrl = "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions";
+sdmxDataset = SDMXParser.getDataset(sdmxDataUrl, {
     headers: {
         'Accept': 'application/vnd.sdmx.data+json;version=2.0.0'
     }
-});
+}, 0);
+/**
+ * getDataset
+ * @param {string} SdmxDataUrl
+ * @param {Object} [RequestOptions] Optional request options as in fetch()
+ * @param {number} [DatasetIndex] // in a single sdmxDataUrl, multiple datasets and structures can be described. Default value 0.
+
 ```
 
 Multiple datasets can be describe with a single URL. By default, we will consider the first dataSet (and the associated structure).
@@ -23,11 +29,12 @@ Multiple datasets can be describe with a single URL. By default, we will conside
 **dataSet information**
 
 ```javascript
-name = sdmx.getName();
-description = sdmx.getDescription();
+name = sdmxDataset.getName();
+description = sdmxDataset.getDescription();
 console.log(name);
 console.log(description);
 /*
+output for sdmxDataUrl provided as example:
 Violence against women
 This table regroups a series of indicators related to violence against women collected from various sources (national surveys, international databases).
 */
@@ -36,9 +43,10 @@ This table regroups a series of indicators related to violence against women col
 **dataSet's dimensions**
 
 ```javascript
-dimensions = sdmx.getDimensions();
+dimensions = sdmxDataset.getDimensions();
 console.log(dimensions);
 /*
+result is basically a dump of the "dimensions" section in SDMX-JSON:
 [
     {
         "id": "FREQ",
@@ -149,9 +157,13 @@ console.log(dimensions);
     }
 ]
 */
+
+geo_pict_dimension = sdmxDataset.getDimension('GEO_PICT');
 ```
 
 **dataSet data**
+
+The library defines an Object called SDMXObservation. `getData` and `slice` returns an array of SDMXObservations.
 
 ```javascript
 
