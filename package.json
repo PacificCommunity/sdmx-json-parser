@@ -1,10 +1,11 @@
 {
   "name": "sdmx-json-parser",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A SDMX-JSON parser written in JavaScript to be executed in a browser.",
-  "main": "dist/parser.js",
+  "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "highcharts.js"
   ],
   "scripts": {
     "build":"webpack",
