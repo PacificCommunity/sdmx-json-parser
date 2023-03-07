@@ -33,6 +33,7 @@ name = sdmxDataset.getName();
 description = sdmxDataset.getDescription();
 console.log(name);
 console.log(description);
+
 /*
 output for sdmxDataUrl provided as example:
 Violence against women
@@ -43,7 +44,7 @@ This table regroups a series of indicators related to violence against women col
 **dataSet's dimensions**
 
 ```javascript
-dimensions = sdmxDataset.getDimensions();
+dimensions = sdmxDataset.getRawDimensions();
 console.log(dimensions);
 /*
 result is basically a dump of the "dimensions" section in SDMX-JSON:
@@ -158,7 +159,301 @@ result is basically a dump of the "dimensions" section in SDMX-JSON:
 ]
 */
 
+```
+**dataSet annotations**
+
+```javascript
+
+annotations = sdmxDataset.getAnnotations();
+console.log(annotations)
+
+/*
+result will be the dump of annotations of the dataset
+   [
+    {
+        "type": "NonProductionDataflow",
+        "text": "true",
+        "texts": {
+            "en": "true"
+        }
+    },
+    {
+        "title": "INDICATOR",
+        "type": "ROW_SECTION"
+    },
+    {
+        "title": "GEO_PICT",
+        "type": "LAYOUT_COLUMN"
+    },
+    {
+        "title": "CROP",
+        "type": "LAYOUT_ROW"
+    },
+    {
+        "title": "FREQ=A,INDICATOR=PROD,TIME_PERIOD_START=2020,TIME_PERIOD_END=2020",
+        "type": "DEFAULT"
+    },
+    {
+        "title": "PDH.STAT,ENVIRONMENT,FAO,CROP",
+        "type": "TAGS"
+    },
+    {
+        "title": "500",
+        "type": "MAXTEXTATTRIBUTELENGTH"
+    },
+    {
+        "title": "urn:sdmx:org.sdmx.infomodel.metadatastructure.MetadataStructure=SPC:MSD_COM_GENERAL(1.0)",
+        "type": "METADATA"
+    },
+    {
+        "type": "HAS_METADATA"
+    },
+    {
+        "type": "ORDER",
+        "text": "20",
+        "texts": {
+            "en": "20"
+        }
+    },
+    {
+        "type": "ORDER",
+        "text": "110",
+        "texts": {
+            "en": "110"
+        }
+    }   
+]
+*/
+
+```
+**dataSet annotations**
+
+```javascript
+
+observations = sdmxDataset.getObservations();
+console.log(observations)
+
+/*
+result will be the dump of observations of the dataset
+   {
+   "0:0:0:1":[
+    700,
+    0,
+    null,
+    null,
+    null,
+    null
+],
+"0:0:0:2":[
+    700,
+    0,
+    null,
+    null,
+    null,
+    null
+],
+"0:0:0:3":[
+    1140,
+    0,
+    null,
+    null,
+    null,
+    null
+],
+"0:0:0:4":[
+    1750,
+    0,
+    null,
+    null,
+    null,
+    null
+],
+}
+*/
+
+
+
+```
+**dataSet annotations**
+
+```javascript
+
+attributes = sdmxDataset.getAttributes();
+console.log(attributes)
+
+/*
+result will be the dump of attributes of the dataset
+  [
+    {
+        "type": "NonProductionDataflow",
+        "text": "true",
+        "texts": {
+            "en": "true"
+        }
+    },
+    {
+        "title": "INDICATOR",
+        "type": "ROW_SECTION"
+    },
+    {
+        "title": "GEO_PICT",
+        "type": "LAYOUT_COLUMN"
+    },
+    {
+        "title": "CROP",
+        "type": "LAYOUT_ROW"
+    },
+    {
+        "title": "FREQ=A,INDICATOR=PROD,TIME_PERIOD_START=2020,TIME_PERIOD_END=2020",
+        "type": "DEFAULT"
+    },
+    {
+        "title": "PDH.STAT,ENVIRONMENT,FAO,CROP",
+        "type": "TAGS"
+    },
+    {
+        "title": "500",
+        "type": "MAXTEXTATTRIBUTELENGTH"
+    },
+    {
+        "title": "urn:sdmx:org.sdmx.infomodel.metadatastructure.MetadataStructure=SPC:MSD_COM_GENERAL(1.0)",
+        "type": "METADATA"
+    },
+    {
+        "type": "HAS_METADATA"
+    },
+    {
+        "type": "ORDER",
+        "text": "20",
+        "texts": {
+            "en": "20"
+        }
+    }
+*/
+
+```
+**dataSet dimensions**
+
+```javascript
+dimensions = sdmxDataset.getDimensions();
+console.log(dimensions);
+
+/*
+result is basically a collection of  only in use "dimensions" section in SDMX-JSON:
+[
+    {
+        "id": "FREQ",
+        "name": "Frequency",
+        "names": {
+            "en": "Frequency"
+        },
+        "keyPosition": 0,
+        "roles": [
+            "FREQ"
+        ],
+        "values": [
+            {
+                "id": "A",
+                "order": 1,
+                "name": "Annual",
+                "names": {
+                    "en": "Annual"
+                },
+                "annotations": [
+                    9
+                ]
+            }
+        ]
+    },
+    {
+        "id": "GEO_PICT",
+        "name": "Pacific Island Countries and territories",
+        "names": {
+            "en": "Pacific Island Countries and territories"
+        },
+        "keyPosition": 1,
+        "roles": [
+            "GEO_PICT"
+        ],
+        "values": [
+            {
+                "id": "CK",
+                "order": 5,
+                "name": "Cook Islands",
+                "names": {
+                    "en": "Cook Islands"
+                },
+                "parent": "POL",
+                "annotations": [
+                    10
+                ]
+            },
+            {
+                "id": "FJ",
+                "order": 6,
+                "name": "Fiji",
+                "names": {
+                    "en": "Fiji"
+                },
+                "parent": "MEL",
+                "annotations": [
+                    11
+                ]
+            },
+            ...
+            {
+                "id": "WS",
+                "order": 25,
+                "name": "Samoa",
+                "names": {
+                    "en": "Samoa"
+                },
+                "parent": "POL",
+                "annotations": [
+                    22
+                ]
+            }
+        ]
+    },
+    ...
+    {
+        "id": "TIME_PERIOD",
+        "name": "Time",
+        "names": {
+            "en": "Time"
+        },
+        "keyPosition": 15,
+        "roles": [
+            "TIME_PERIOD"
+        ],
+        "values": [
+            {
+                "start": "2013-01-01T00:00:00",
+                "end": "2013-12-31T23:59:59",
+                "id": "2013",
+                "name": "2013",
+                "names": {
+                    "en": "2013"
+                }
+            },
+            ...
+            {
+                "start": "2006-01-01T00:00:00",
+                "end": "2006-12-31T23:59:59",
+                "id": "2006",
+                "name": "2006",
+                "names": {
+                    "en": "2006"
+                }
+            }
+        ]
+    }
+]
+*/
 geo_pict_dimension = sdmxDataset.getDimension('GEO_PICT');
+
+
+
 ```
 
 **dataSet data**
@@ -378,7 +673,6 @@ console.log(slice);
             'OBS_COMMENT': null
         }]
     },
-
 ]
 
 */
