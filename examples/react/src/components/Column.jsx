@@ -13,7 +13,7 @@ const Column = () => {
       await sdmx.getDatasets(
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_WASTE,1.0/..SOLIDWASTEPC.?dimensionAtObservation=AllDimensions&format=jsondata"
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const [yAxis, xAxis] = await getHighChartsData(
         data,
         "column",

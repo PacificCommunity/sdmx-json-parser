@@ -1,12 +1,15 @@
 {
-  "name": "sdmx-json-parser",
-  "version": "0.0.1",
+  "name": "@yogender.s/parser",
+  "version": "0.0.5",
   "description": "A SDMX-JSON parser written in JavaScript to be executed in a browser.",
   "main": "index.js",
   "files": [
     "index.js",
     "highcharts.js"
   ],
+  "publishConfig": {
+    " @yogender.s/parser": "https://gitlab.com/api/v4/projects/43975537/packages/npm/"
+  },
   "scripts": {
     "build":"webpack",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -18,7 +18,7 @@ const Lollipop = () => {
       await sdmx.getDatasets(
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_NMDI_FIS,1.0/..SPC_14_b_1......?startPeriod=2013&endPeriod=2022&dimensionAtObservation=AllDimensions&format=jsondata"
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const seriesData = await getHighChartsData(
         data,
         "lollipop",

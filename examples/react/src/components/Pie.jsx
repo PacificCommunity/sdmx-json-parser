@@ -10,7 +10,7 @@ const Pie = () => {
   useEffect(() => {
     (async () => {
         await sdmx.getDatasets("https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_HHEXP,1.0/A.CK.HHEXPPROP._T._T.10+11+12+01+02+03+04+05+06+07+08+09.USD?startPeriod=2013&endPeriod=2015&lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata")
-        const data = await sdmx.getData()
+        const data = sdmx.getData()
         const datas = await getHighChartsData(data, "pie","","value","COMMODITY");
         const seriesData = [{data:datas}]
       setData(seriesData);

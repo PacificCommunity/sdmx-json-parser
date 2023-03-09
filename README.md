@@ -9,7 +9,7 @@ SDMX-JSON-parser provides a set of utility function to parse a SDMX-JSON message
 
 
 ```javascript
-import {  } from SDMXParser
+import { SDMXParser } from SDMXParser
 const sdmxDataUrl = "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions";
 sdmxDataset = SDMXParser.getDataset(sdmxDataUrl, {
     headers: {
@@ -450,7 +450,37 @@ result is basically a collection of  only in use "dimensions" section in SDMX-JS
     }
 ]
 */
-geo_pict_dimension = sdmxDataset.getDimension('GEO_PICT');
+
+geo_pict_dimension = sdmxDataset.getDimension('FREQ');
+/*
+[
+    {
+        "id": "FREQ",
+        "name": "Frequency",
+        "names": {
+            "en": "Frequency"
+        },
+        "keyPosition": 0,
+        "roles": [
+            "FREQ"
+        ],
+        "values": [
+            {
+                "id": "A",
+                "order": 1,
+                "name": "Annual",
+                "names": {
+                    "en": "Annual"
+                },
+                "annotations": [
+                    9
+                ]
+            }
+        ]
+    }
+]
+*/
+
 
 
 

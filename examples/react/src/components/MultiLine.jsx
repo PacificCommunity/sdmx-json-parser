@@ -13,9 +13,7 @@ const MultiLine = () => {
             await sdmx.getDatasets(
                   "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_CROPS,1.0/A..5510.136?dimensionAtObservation=AllDimensions&format=jsondata"
                 );
-                const data = await sdmx.getData();  
-                const res = await sdmx.getAnnotations();
-                console.log("🚀 ~ file: MultiLine.jsx:18 ~ res:", res)
+                const data =  sdmx.getData();  
                 const [seriesData,xAxis] = await getHighChartsData(data, "multiLine","TIME_PERIOD","value","GEO_PICT");
              setData([seriesData,xAxis])
            })()

@@ -12,7 +12,7 @@ const SingleLine = () => {
       await sdmx.getDatasets(
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_COMMODITY_PRICES,1.0/M.COCONUT_OIL.COMPRICE?startPeriod=2010-01&endPeriod=2022-04&dimensionAtObservation=AllDimensions&format=jsondata"
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const [yAxis, xAxis] = await getHighChartsData(data, "line","TIME_PERIOD","value");
       setData([yAxis, xAxis]);
     })();

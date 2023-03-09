@@ -12,7 +12,7 @@ const MultiColumn = () => {
       await sdmx.getDatasets(
         `https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata`
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const [seriesData, xAxis] = await getHighChartsData(
         data,
         "multiColumn",
