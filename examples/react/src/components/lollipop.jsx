@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { SDMXParser} from "@yogender.s/parser";
-import { getHighChartsData } from "@yogender.s/parser/highcharts";
+import { SDMXParser } from "@yogender.s/parser";
+import { getHighChartsData } from "../highcharts";
 import highchartsLollipop from "highcharts/modules/lollipop";
 import HC_more from "highcharts/highcharts-more";
 import highchartsDumbbell from "highcharts/modules/dumbbell";
@@ -18,7 +18,7 @@ const Lollipop = () => {
       await sdmx.getDatasets(
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_NMDI_FIS,1.0/..SPC_14_b_1......?startPeriod=2013&endPeriod=2022&dimensionAtObservation=AllDimensions&format=jsondata"
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const seriesData = await getHighChartsData(
         data,
         "lollipop",

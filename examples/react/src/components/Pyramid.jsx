@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { SDMXParser } from "@yogender.s/parser";
-import { getHighChartsData } from "@yogender.s/parser/highcharts";
+import { getHighChartsData } from "../highcharts";
 
 const Pyramid = () => {
   const [data, setData] = useState([]);
@@ -12,7 +12,7 @@ const Pyramid = () => {
       await sdmx.getDatasets(
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_POP_PROJ,3.0/A.CK.MIDYEARPOPEST.F+M.Y70T999+Y65T69+Y60T64+Y55T59+Y50T54+Y45T49+Y40T44+Y35T39+Y30T34+Y25T29+Y20T24+Y15T19+Y10T14+Y05T09+Y00T04?startPeriod=2015&endPeriod=2050&dimensionAtObservation=AllDimensions&format=jsondata"
       );
-      const data = await sdmx.getData();
+      const data = sdmx.getData();
       const [seriesData, xAxis] = await getHighChartsData(
         data,
         "pyramid",
