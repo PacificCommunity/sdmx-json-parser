@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { SDMXParser } from "@yogender.s/parser";
-import { getHighChartsData } from "@yogender.s/parser/highcharts";
+import { getHighChartsData } from "../highcharts";
 
 const MultiColumn = () => {
   const [data, setData] = useState([]);
@@ -43,9 +43,9 @@ const MultiColumn = () => {
       categories: xAxis,
     },
     yAxis: {
-        title: {
-            text: "Number of persons in relative frequency"
-        }
+      title: {
+        text: "Number of persons in relative frequency",
+      },
     },
     legend: {
       layout: "vertical",

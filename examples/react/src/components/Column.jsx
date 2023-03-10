@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { SDMXParser } from "@yogender.s/parser";
-import { getHighChartsData } from "@yogender.s/parser/highcharts";
+import { getHighChartsData } from "../highcharts";
 
 const Column = () => {
   const [data, setData] = useState([]);
@@ -51,16 +51,15 @@ const Column = () => {
     },
 
     yAxis: {
-        title:{
-            text:"TON"
-        }
+      title: {
+        text: "TON",
+      },
     },
     series: [
       {
         data: yAxis,
       },
     ],
-   
   };
   return (
     <>

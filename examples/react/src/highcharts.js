@@ -1,4 +1,4 @@
-export async function getMultiLineChart(data, xAxis, yAxis = "value", legend) {  
+export async function getMultiLineChart(data, xAxis, yAxis = "value", legend) {
   const seriesData = data.reduce((acc, cur) => {
     const existingRecord = acc.find((item) => {
       return item.name === cur[legend];
@@ -62,7 +62,7 @@ export async function getMultiColumnChart(
     return acc;
   }, []);
   const xAxisValue = [...new Set(arr)];
- 
+
   let seriesData = [];
 
   const group = xAxisValue.map((m, i) => {
@@ -133,27 +133,25 @@ export async function getPyramidChart(
   ];
 
   return [seriesData, xAxisValue];
-
 }
 
-export async function getLollipopChart(data, xAxis, yAxis='value',legend) {
-    const datas =  data.reduce((acc, cur) => {
-        const existingRecord = acc.find((item) => {
-          return item.name === cur[xAxis];
-        });
-        if (existingRecord) {
-           
-            existingRecord.y < cur[yAxis] && (existingRecord.y = cur[yAxis])
-        } else {
-          acc.push({
-            name: cur[xAxis],
-            y: !cur[yAxis] ? 0: cur[yAxis],
-          });
-        }
-        return acc;
-      }, []);
-      const seriesData=[{name:legend,data:datas}]
-    return seriesData;
+export async function getLollipopChart(data, xAxis, yAxis = "value", legend) {
+  const datas = data.reduce((acc, cur) => {
+    const existingRecord = acc.find((item) => {
+      return item.name === cur[xAxis];
+    });
+    if (existingRecord) {
+      existingRecord.y < cur[yAxis] && (existingRecord.y = cur[yAxis]);
+    } else {
+      acc.push({
+        name: cur[xAxis],
+        y: !cur[yAxis] ? 0 : cur[yAxis],
+      });
+    }
+    return acc;
+  }, []);
+  const seriesData = [{ name: legend, data: datas }];
+  return seriesData;
 }
 
 export async function getHighChartsData(
@@ -186,6 +184,6 @@ export async function getHighChartsData(
       return await getPyramidChart(data, xAxis, yAxis, legend);
 
     case "lollipop":
-      return await getLollipopChart(data, xAxis, yAxis,legend);
+      return await getLollipopChart(data, xAxis, yAxis, legend);
   }
 }

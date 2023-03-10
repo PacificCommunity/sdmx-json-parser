@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { SDMXParser } from "@yogender.s/parser";
-import { getHighChartsData } from "@yogender.s/parser/highcharts";
+import { getHighChartsData } from "../highcharts";
 
 const SingleLine = () => {
   const [data, setData] = useState([]);
@@ -13,7 +13,12 @@ const SingleLine = () => {
         "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_COMMODITY_PRICES,1.0/M.COCONUT_OIL.COMPRICE?startPeriod=2010-01&endPeriod=2022-04&dimensionAtObservation=AllDimensions&format=jsondata"
       );
       const data = sdmx.getData();
-      const [yAxis, xAxis] = await getHighChartsData(data, "line","TIME_PERIOD","value");
+      const [yAxis, xAxis] = await getHighChartsData(
+        data,
+        "line",
+        "TIME_PERIOD",
+        "value"
+      );
       setData([yAxis, xAxis]);
     })();
   }, []);
@@ -32,16 +37,18 @@ const SingleLine = () => {
     xAxis: {
       categories: xAxis,
     },
-    yAxis:{
-        title:{
-            text:"USD / mt"
-        }
+    yAxis: {
+      title: {
+        text: "USD / mt",
+      },
     },
-    
-    series: [{
+
+    series: [
+      {
         name: "Coconut Oil",
         data: yAxis,
-    }],
+      },
+    ],
 
     responsive: {
       rules: [

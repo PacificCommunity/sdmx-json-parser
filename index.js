@@ -161,38 +161,6 @@ export class SDMXParser {
     return this.annotations;
   }
 
-  /**
-   * @description slice out the given dimensions with the given value.
-   * @param {object} containes dimensions name as a key and their respective values ids as an array in values
-   */
-  // slice(options) {
-  //   const dim = this.getRawDimensions();
-  //   const observations = this.getObservations();
-  //   const keys = Object.keys(options);
-  //   dim.forEach((val, index) => {
-  //     keys.map((val2, index2) => {
-  //       if (val2 === val.id) {
-  //         val.values.map((val3, index3) => {
-  //           options[val2].forEach((val4, index4) => {
-  //             if (val3.id === val4) {
-  //               for (let key in observations){
-  //                 const keyArray = key.split(":");
-  //                 keyArray.map((val5, index5) => {
-  //                   if (val5 === index3){
-
-  //                   }
-  //                 })
-  //               }
-  //             }
-  //           })
-  //         })
-  //       }
-  //     });
-  //   });
-
-  // console.log("🚀 ~ file: index.js:161 ~ SDMXParser ~ slice ~ dim:", dim)
-  // }
-
   // TODO: need to set the JSON Data for chart, table, card.
 
   /**
