@@ -82,7 +82,13 @@ async function sdmxParser(api, chartType) {
 
 (async () => {
   const response = await sdmxParser(
-    "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_NMDI_FIS,1.0/..SPC_14_b_1......?startPeriod=2013&endPeriod=2022&dimensionAtObservation=AllDimensions&format=jsondata",
-    "lollipop"
+    "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata",
+    "line"
   );
+
+await resp.getDatasets(
+  "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"
+)
+const res = resp.slice({"GEO_PICT":["NR"]});
+console.log("🚀 ~ file: example.js:93 ~ res:", res)
 })();
