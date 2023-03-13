@@ -13,7 +13,9 @@ dist/
 # Compiled Python bytecode
 *.py[cod]
 
+#build file of index.js file
 docs/
+
 .npmrc
 # Log files
 *.log

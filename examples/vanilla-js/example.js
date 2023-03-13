@@ -1,6 +1,6 @@
-import { SDMXParser } from "../../index.js"; //"../../index.js";
 
 (async () => {
+  const SDMXParser = parser.SDMXParser
   const resp = new SDMXParser();
   await resp.getDatasets(
     "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"

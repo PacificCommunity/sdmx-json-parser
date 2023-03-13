@@ -5,8 +5,7 @@
   "main": "example.js",
   "type": "module",
   "scripts": {
-    "server": "live-server --entry-file='./index.html' --port=4000",
-    "serving":"serve ../vanilla-js",
+    "server":"cp -R ../../dist . && serve ../vanilla-js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
