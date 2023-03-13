@@ -13,7 +13,7 @@ dist/
 # Compiled Python bytecode
 *.py[cod]
 
-./docs
+docs/
 .npmrc
 # Log files
 *.log
