@@ -12,6 +12,7 @@ node_modules/
 # Compiled Python bytecode
 *.py[cod]
 
+./docs
 .npmrc
 # Log files
 *.log
