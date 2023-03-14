@@ -1,13 +1,14 @@
 {
   "name": "sdmx-json-parser",
-  "version": "0.1.8",
+  "version": "0.1.11",
   "description": "A SDMX-JSON parser written in JavaScript to be executed in a browser.",
-  "main": "index.js",
+  "main": "./dist/parser.js",
   "files": [
-    "index.js"
+    "./dist/parser.js"
   ],
   "scripts": {
-    "build":"webpack",
+    "generate-doc": "jsdoc ./index.js -d ./docs",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,6 +27,7 @@
   },
   "homepage": "https://github.com/PacificCommunity/sdmx-json-parser#readme",
   "devDependencies": {
+    "jsdoc": "^4.0.2",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
   }

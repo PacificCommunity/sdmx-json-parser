@@ -1,6 +1,7 @@
+/** Class containing parser data */
 export class SDMXParser {
   /**
-   *  initializing the global variable using constructor
+   *  Initializing the global variables using constructor
    */
   constructor() {
     this.getJSON;
@@ -14,16 +15,18 @@ export class SDMXParser {
 
   /**
    *
-   * @description get the SDMX JSON dataSet from the api
-   * @param {string} api
-   * @param {Object} Optional request options as in fetch()
-   * @returns  SDMX JSON response
+   * This function gets api url in parameter and generates the SDMX-JSON dataSet from the api
+   * @param {String} api URL of the SDMX api
+   * @param {Object} Options Request options used while fetching (optional)
+   * @return {Array} SDMX-JSON response
    */
   async getDatasets(api, options = {}) {
     try {
+      if (!api.includes("format=jsondata")) {
+        api = `${api}&format=jsondata`;
+      }
       const response = await fetch(api, options);
       this.getJSON = await response.json();
-      // this.getJSON = await axios.get(api, options);
     } catch (err) {
       throw new Error(err.response.data);
     }
@@ -31,8 +34,8 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the name from the SDMX JSON response
-   * @returns {string} name of the dataset
+   * Get the name or title from the SDMX-JSON response
+   * @return {String} Name or Title from the dataset
    */
   getName() {
     try {
@@ -44,8 +47,8 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the description from the SDMX JSON response
-   * @returns {string} description of the dataset
+   * Get the Description or Subtitle from the SDMX-JSON response
+   * @return {String} Description or Subtitle of the dataset
    */
   getDescription() {
     try {
@@ -57,12 +60,11 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the attributes from the SDMX JSON response
-   * @returns {Array} attributes of the dataset
+   * Get the Attributes from the SDMX-JSON response
+   * @return {Array} Attributes of the dataset
    */
   getAttributes() {
     try {
-      getData;
       this.attributes = this.getJSON.data.structures[0].attributes.observation;
     } catch (err) {
       throw new Error(err.response.data);
@@ -72,8 +74,8 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the raw dimensions which are in use for the data
-   * @returns {Array} dimensions which are in use for the data
+   * Get the raw dimensions which can be use in axis
+   * @return {Array} Dimensions which are in use for axis
    */
 
   getRawDimensions() {
@@ -87,8 +89,9 @@ export class SDMXParser {
 
   /**
    *
-   * @description get the dimensions from the SDMX JSON response
-   * @returns {Array} all dimensions of the dataset
+   * Get all the dimensions which are used for getting values from the SDMX-JSON response
+   * @param {String} options Dimension id to get only specific dimension (optional)
+   * @return {Array} Active Dimensions of the dataset
    */
   getDimensions(options) {
     if (options) {
@@ -129,8 +132,8 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the observations from the SDMX JSON response
-   * @returns {Array} observations of the dataset
+   * Get the observations from the SDMX-JSON response
+   * @return {Object} Observations of the dataset
    */
   getObservations() {
     try {
@@ -149,8 +152,8 @@ export class SDMXParser {
   }
 
   /**
-   * @description get the annotations of the dataset
-   * @returns {Array} annotations of the dataset
+   * Get the annotations of the dataset
+   * @return {Array} Annotations of the dataset
    */
   getAnnotations() {
     try {
@@ -161,11 +164,93 @@ export class SDMXParser {
     return this.annotations;
   }
 
+  /**
+   * Slice by dimensions with their respective values from the SDMX-JSON response
+   * @param {Object} options Contains the dimension and the values to be sliced
+   * @return {Array} Contains all the dimensions with their respective values also have measure and attributes
+   */
+  slice(options) {
+    const observations = this.getObservations(); //  provides object
+    const dimensions = this.getRawDimensions(); // provides array  of objects
+    const attributes = this.getAttributes(); // provides array of objects
+    let dimensionKeys = [];
+    let result = [];
+    let indexing = 0;
+    const allKeys = [];
+
+    dimensions.map((val, _index) => {
+      if (Object.keys(options).includes(val.id)) {
+        dimensionKeys.push({
+          name: val.id,
+          keyPosition: val.keyPosition,
+          value: val.values,
+          index: [],
+        });
+      }
+    });
+
+    dimensionKeys.map((val, _index) => {
+      val.value.map((val2, index2) => {
+        if (options[val.name].includes(val2.id)) {
+          val.index.push(index2);
+        }
+      });
+      delete val.value;
+    });
+
+    // add the sdmxKeys to the respective dimensionKeys
+    Object.keys(observations).map((val, _index) => {
+      const keyArray = val.split(":");
+      dimensionKeys.forEach((val2, index2) => {
+        if (val2.index.includes(Number(keyArray[val2.keyPosition]))) {
+          if (!val2.sdmxKeys) {
+            val2.sdmxKeys = [keyArray];
+          } else {
+            val2.sdmxKeys.push(keyArray);
+          }
+        }
+      });
+    });
+
+    dimensionKeys.forEach((val) => {
+      allKeys.push(...val.sdmxKeys);
+    });
+
+    let count = attributes.length;
+    allKeys.forEach((val, index) => {
+      let key = val.join(":");
+      result.push({
+        dimensions: { sdmxKeys: val },
+        measure: observations[key][0],
+        attributes: {},
+      });
+      for (let i = 0; i < count; i++) {
+        result[index].attributes[attributes[i].id] = attributes[i].values[
+          observations[key][i + 1]
+        ]
+          ? {
+              id: attributes[i].values[observations[key][i + 1]].id,
+              name: attributes[i].values[observations[key][i + 1]].name,
+            }
+          : null;
+      }
+
+      val.forEach((val2, index2) => {
+        result[indexing].dimensions[dimensions[index2].id] = {
+          id: dimensions[index2].values[val2].id,
+          name: dimensions[index2].values[val2].name,
+        };
+      });
+      indexing++;
+    });
+    return result;
+  }
+
   // TODO: need to set the JSON Data for chart, table, card.
 
   /**
-   * @description get the JSON data which will be used in the chart, table, card
-   * @returns {Array} data of the dataset
+   * Get the parsed JSON data which will be used in the chart, table, card
+   * @return {Array} Parsed data of the SDMX-JSON dataset
    */
 
   getData() {
