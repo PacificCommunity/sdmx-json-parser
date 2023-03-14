@@ -5,7 +5,17 @@ Usage
 SDMX-JSON-parser provides a set of utility function to parse a SDMX-JSON message and extract data arrays.
 
 ```javascript
-// import { SDMXParser } from "../../index.js";
+
+/*
+    To use packages node_modules needed
+*/
+    npm install
+
+/*
+    once node_modules folder is available we need to start the server. make sure to use node version above 14 
+*/
+
+    npm run server
 /*
 once you import the parser create a object.
 */
