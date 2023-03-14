@@ -13,7 +13,7 @@ dist/
 # Compiled Python bytecode
 *.py[cod]
 
-#build file of index.js file
+# Generated docs
 docs/
 
 .npmrc
@@ -25,6 +25,8 @@ docs/
 
 # Maven
 target/
+
+#build file of index.js file
 dist/
 
 # JetBrains IDE

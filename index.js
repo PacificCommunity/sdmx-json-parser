@@ -15,7 +15,7 @@ export class SDMXParser {
 
   /**
    *
-   * This function gets api url in paramtere and generates the SDMX-JSON dataSet from the api
+   * This function gets api url in parameter and generates the SDMX-JSON dataSet from the api
    * @param {String} api URL of the SDMX api
    * @param {Object} Options Request options used while fetching (optional)
    * @return {Array} SDMX-JSON response

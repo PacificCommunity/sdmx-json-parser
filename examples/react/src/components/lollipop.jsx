@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { SDMXParser } from "@yogender.s/parser/dist/parser";
+import { SDMXParser } from "@yogender.s/parser";
 import { getHighChartsData } from "../highcharts";
 import highchartsLollipop from "highcharts/modules/lollipop";
 import HC_more from "highcharts/highcharts-more";
