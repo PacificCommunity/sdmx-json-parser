@@ -1,6 +1,6 @@
 {
   "name": "sdmx-json-parser",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "A SDMX-JSON parser written in JavaScript to be executed in a browser.",
   "main": "./dist/parser.js",
   "files": [

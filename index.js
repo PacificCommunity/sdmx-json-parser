@@ -26,9 +26,14 @@ export class SDMXParser {
         api = `${api}&format=jsondata`;
       }
       const response = await fetch(api, options);
+      if (response.status !== 200) {
+        throw new Error(
+          "Error while fetching data please provide valid api url"
+        );
+      }
       this.getJSON = await response.json();
     } catch (err) {
-      throw new Error(err.response.data);
+      throw new Error(err);
     }
     return this.getJSON;
   }
@@ -38,11 +43,17 @@ export class SDMXParser {
    * @return {String} Name or Title from the dataset
    */
   getName() {
-    try {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0] &&
+      this.getJSON.data.structures[0].names
+    ) {
       this.name = this.getJSON.data.structures[0].names.en;
-    } catch (err) {
-      throw new Error(err.response.data);
+    } else {
+      throw new Error("Name not found");
     }
+
     return this.name;
   }
 
@@ -51,11 +62,17 @@ export class SDMXParser {
    * @return {String} Description or Subtitle of the dataset
    */
   getDescription() {
-    try {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0] &&
+      this.getJSON.data.structures[0].descriptions
+    ) {
       this.descriptions = this.getJSON.data.structures[0].descriptions.en;
-    } catch (err) {
-      throw new Error(err.response.data);
+    } else {
+      throw new Error("Description not found");
     }
+
     return this.descriptions;
   }
 
@@ -64,10 +81,15 @@ export class SDMXParser {
    * @return {Array} Attributes of the dataset
    */
   getAttributes() {
-    try {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0] &&
+      this.getJSON.data.structures[0].attributes
+    ) {
       this.attributes = this.getJSON.data.structures[0].attributes.observation;
-    } catch (err) {
-      throw new Error(err.response.data);
+    } else {
+      throw new Error("Attributes not found");
     }
 
     return this.attributes;
@@ -79,10 +101,15 @@ export class SDMXParser {
    */
 
   getRawDimensions() {
-    try {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0] &&
+      this.getJSON.data.structures[0].dimensions
+    ) {
       this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
-    } catch (err) {
-      throw new Error(err.response.data);
+    } else {
+      throw new Error("Dimensions not found");
     }
     return this.dimensions;
   }
@@ -104,9 +131,9 @@ export class SDMXParser {
       }
       return dimensions;
     }
-    const [observations, dimension] = [
-      this.getObservations(),
+    const [dimension, observations] = [
       this.getRawDimensions(),
+      this.getObservations(),
     ];
 
     let KeyIndexs = [];
@@ -136,17 +163,15 @@ export class SDMXParser {
    * @return {Object} Observations of the dataset
    */
   getObservations() {
-    try {
-      if (
-        this.getJSON.data.dataSets &&
-        this.getJSON.data.dataSets[0].observations
-      ) {
-        this.observations = this.getJSON.data.dataSets[0].observations;
-      } else {
-        this.observations = "No Data Found";
-      }
-    } catch (err) {
-      throw new Error(err);
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.dataSets &&
+      this.getJSON.data.dataSets[0].observations
+    ) {
+      this.observations = this.getJSON.data.dataSets[0].observations;
+    } else {
+      throw new Error("Observations not found");
     }
     return this.observations;
   }
@@ -156,11 +181,17 @@ export class SDMXParser {
    * @return {Array} Annotations of the dataset
    */
   getAnnotations() {
-    try {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0] &&
+      this.getJSON.data.structures[0].annotations
+    ) {
       this.annotations = this.getJSON.data.structures[0].annotations;
-    } catch (err) {
-      throw new Error(err.response.data);
+    } else {
+      throw new Error("Annotations not found");
     }
+
     return this.annotations;
   }
 
@@ -177,7 +208,12 @@ export class SDMXParser {
     let result = [];
     let indexing = 0;
     const allKeys = [];
-
+    const dimensionsId = dimensions.map((val) => val.id);
+    Object.keys(options).forEach((val) => {
+      if (!dimensionsId.includes(val)) {
+        throw new Error(`provided key ${val} is not valid dimension`);
+      }
+    });
     dimensions.map((val, _index) => {
       if (Object.keys(options).includes(val.id)) {
         dimensionKeys.push({
@@ -188,7 +224,7 @@ export class SDMXParser {
         });
       }
     });
-
+    
     dimensionKeys.map((val, _index) => {
       val.value.map((val2, index2) => {
         if (options[val.name].includes(val2.id)) {
@@ -254,29 +290,28 @@ export class SDMXParser {
    */
 
   getData() {
-    try {
-      const observations = this.getObservations();
-
-      const incrementalDimensions = this.getDimensions();
-      let res = [];
-      for (let key in observations) {
-        const keyArray = key.split(":");
-        let keyto = {};
-
-        keyArray.forEach((_val, index) => {
-          incrementalDimensions.find((val2, _index2) => {
-            if (val2.keyPosition === index) {
-              keyto[val2.id] = val2.values[keyArray[index]].name; // need to remove that name and send whole object
-              keyto.value = observations[key][0];
-            }
-          });
-        });
-        res.push(keyto);
-      }
-
-      return res;
-    } catch (error) {
-      return error;
+    if (!this.getJSON) {
+      throw new Error("Please load the api first");
     }
+    const observations = this.getObservations();
+
+    const incrementalDimensions = this.getDimensions();
+    let res = [];
+    for (let key in observations) {
+      const keyArray = key.split(":");
+      let keyto = {};
+
+      keyArray.forEach((_val, index) => {
+        incrementalDimensions.find((val2, _index2) => {
+          if (val2.keyPosition === index) {
+            keyto[val2.id] = val2.values[keyArray[index]].name; // need to remove that name and send whole object
+            keyto.value = observations[key][0];
+          }
+        });
+      });
+      res.push(keyto);
+    }
+
+    return res;
   }
 }
