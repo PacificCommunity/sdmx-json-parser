@@ -1,5 +1,3 @@
-// import  {SDMXParser}  from "../../index.js"
-
 (async () => {
   const SDMXParser = parser.SDMXParser;
   const resp = new SDMXParser();

@@ -45,7 +45,6 @@ export class SDMXParser {
   getName() {
     if (
       this.getJSON &&
-      this.getJSON &&
       this.getJSON.data &&
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].names
@@ -64,7 +63,6 @@ export class SDMXParser {
    */
   getDescription() {
     if (
-      this.getJSON &&
       this.getJSON &&
       this.getJSON.data &&
       this.getJSON.data.structures[0] &&
@@ -85,7 +83,6 @@ export class SDMXParser {
   getAttributes() {
     if (
       this.getJSON &&
-      this.getJSON &&
       this.getJSON.data &&
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].attributes
@@ -105,7 +102,6 @@ export class SDMXParser {
 
   getRawDimensions() {
     if (
-      this.getJSON &&
       this.getJSON &&
       this.getJSON.data &&
       this.getJSON.data.structures[0] &&
