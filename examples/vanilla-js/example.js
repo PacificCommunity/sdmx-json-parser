@@ -1,6 +1,7 @@
+// import  {SDMXParser}  from "../../index.js"
 
 (async () => {
-  const SDMXParser = parser.SDMXParser
+  const SDMXParser = parser.SDMXParser;
   const resp = new SDMXParser();
   await resp.getDatasets(
     "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"
@@ -29,6 +30,6 @@
   const annotations = resp.getAnnotations();
   console.log("🚀 ~ file: example.js:108 ~ annotations", annotations);
 
-  const slice = resp.slice({ GEO_PICT: ["TO"] });
-  console.log("🚀 ~ file: example.js:31 ~ slice:", slice);
+  const slice = resp.slice({ GEO_PICT: ["TO", "FJ"] });
+  console.log("🚀 ~ file: example.js:36 ~ slice:", slice);
 })();

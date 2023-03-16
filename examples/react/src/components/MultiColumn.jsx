@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { SDMXParser } from "@yogender.s/parser";
+import { SDMXParser } from "sdmx-json-parser";
 import { getHighChartsData } from "../highcharts";
 
 const MultiColumn = () => {
