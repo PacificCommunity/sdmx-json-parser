@@ -107,7 +107,16 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].dimensions
     ) {
-      this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
+      if (this.getJSON.data.structures[0].dimensions.series.length > 0) {
+        this.dimensions = this.getJSON.data.structures[0].dimensions.series;
+        if (this.getJSON.data.structures[0].dimensions.observation.length > 0) {
+          this.dimensions = this.dimensions.concat(
+            this.getJSON.data.structures[0].dimensions.observation
+          )
+        }
+      } else {
+        this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
+      }
     } else {
       throw new Error("Dimensions not found");
     }
@@ -166,12 +175,25 @@ export class SDMXParser {
     if (
       this.getJSON &&
       this.getJSON.data &&
-      this.getJSON.data.dataSets &&
-      this.getJSON.data.dataSets[0].observations
+      this.getJSON.data.dataSets
     ) {
-      this.observations = this.getJSON.data.dataSets[0].observations;
-    } else {
-      throw new Error("Observations not found");
+      if (this.getJSON.data.dataSets[0].series) {
+        this.observations = {};
+        const series = this.getJSON.data.dataSets[0].series;
+
+        let seriesKeys = Object.keys(series);
+        seriesKeys.forEach((val, _index) => {
+          const serie = series[val];
+          const obs_keys = Object.keys(serie.observations);
+          obs_keys.forEach((val2, _index2) => {
+            this.observations[`${val}:${val2}`] = serie.observations[val2];
+          });
+        });
+      } else if (this.getJSON.data.dataSets[0].observations) {
+        this.observations = this.getJSON.data.dataSets[0].observations;
+      } else {
+        throw new Error("Series not found and observations empty");
+      }
     }
     return this.observations;
   }

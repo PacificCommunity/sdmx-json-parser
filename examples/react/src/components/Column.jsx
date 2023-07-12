@@ -11,7 +11,8 @@ const Column = () => {
   useEffect(() => {
     (async () => {
       await sdmx.getDatasets(
-        "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_WASTE,1.0/..SOLIDWASTEPC.?dimensionAtObservation=AllDimensions&format=jsondata"
+        //"https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_WASTE,1.0/..SOLIDWASTEPC.?dimensionAtObservation=AllDimensions&format=jsondata"
+        "https://www.ilo.org/sdmx/rest/data/ILO,DF_EMP_TEMP_SEX_AGE_STE_NB,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15.STE_ICSE93_6+STE_ICSE93_5+STE_ICSE93_4+STE_ICSE93_3+STE_ICSE93_2+STE_ICSE93_1?endPeriod=2022&lastNObservations=1"
       );
       const data = sdmx.getData();
       const [yAxis, xAxis] = await getHighChartsData(
