@@ -1,3 +1,4 @@
+import { JSONParser } from "@streamparser/json";
 /** Class containing parser data */
 export class SDMXParser {
   /**
@@ -11,6 +12,31 @@ export class SDMXParser {
     this.annotations;
     this.observations;
     this.attributes;
+  }
+
+  /**
+   * This function parses the `series` section.
+   * SDMX-JSON allows duplicate keys which are not supported by JSON.parse
+   * series are expanded to observatoins with a key formed by the series key and the observation key
+   * A JSON Stream parser is used to process the duplicated keys
+   * @param {String} txt  SDMX-JSON response as a string
+   * @return {Object} observations
+   */
+  parseSeries(txt) {
+    let observations = {};
+    try {
+      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*"]});
+      parser.onValue = function (value, key, parent, stack) {
+        Object.keys(value.value.observations).forEach((obskey, i) => {
+          observations[`${value.key}:${obskey}`] = value.value.observations[obskey];
+        })
+      }
+
+      parser.write(txt);
+    } catch (err) {
+      throw new Error(err);
+    }
+    return observations;
   }
 
   /**
@@ -31,7 +57,14 @@ export class SDMXParser {
           "Error while fetching data please provide valid api url"
         );
       }
-      this.getJSON = await response.json();
+      const txt = await response.text();
+      const seriesObservations = this.parseSeries(txt);
+      this.getJSON = JSON.parse(txt);
+      // if series are present in the response, replace the badly-parsed series with observations extracted by parseSeries
+      if (Object.keys(seriesObservations).length > 0) {
+        this.getJSON.data.dataSets[0].observations = seriesObservations;
+        delete this.getJSON.data.dataSets[0].series;
+      }
     } catch (err) {
       throw new Error(err);
     }
