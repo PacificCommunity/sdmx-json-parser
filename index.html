@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/dumbbell.js"></script>
+    <script src="https://code.highcharts.com/modules/lollipop.js"></script>
+    <script src="./json-viewer/src/json-viewer.js"></script>
+    <link rel="stylesheet" type="text/css" href="./json-viewer/src/json-viewer.css"></link>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container">
+    <h1>SDMX-JSON Parser</h1>
+    <p>SDMX-JSON Parser is a JavaScript library that parses SDMX-JSON data into a JSON object. It is designed to be used in web applications that need to consume SDMX-JSON data.</p>
+    <p>Latest version <a href="https://github.com/PacificCommunity/sdmx-json-parser">0.2.0-beta.1</a> available on <a href="https://www.npmjs.com/package/sdmx-json-parser/v/0.2.0-beta.1">npm</a>. <a href="">API Documentation</a></p>
+    <div class="border" style="width: 500px;height: 60px;">
+      <pre><code>
+        npm install sdmx-json-parser
+      </code></pre>
+    </div><br/>
+  </div>
+  <div class="container">
+    <h2>Demo</h2>
+    <p>Discover the features of the sdmx-json-parser with our demo application.</p>
+    <div class="mb-3">
+      <label for="sample-select" class="form-label">Select a SDMX source</label>
+      <select id="sample-select" class="form-select"></select>
+    </div>
+    <div class="mb-3">
+      <label for="sample-url" class="form-label">Or enter a SDMX API URL and press ↵</label>
+      <input id="sample-url" type="text" class="form-control"/>
+    </div>
+    <p>Check the output of the main functions:</p>
+    <div class="card">
+      <div class="card-body">
+        <code class="fw-lighter">getName</code>
+        <h2 class="card-title" id="sample-name"></h2>
+        <div class="card-body">
+          <code class="small">getDescription</code>
+          <p class="card-text" id="sample-description"></p>
+          <code>getDimensions</code>
+          <div id="json-content-dimensions"></div>
+          <code>getAttributes</code>
+          <div id="json-content-attributes"></div>
+          <code>getAnnotations</code>
+          <div id="json-content-annotations"></div>
+          <code>getObservations</code>
+          <div id="json-content-observations"></div>
+          <code>getData</code>
+          <div id="json-content-data"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./dist/parser.js"></script>
+  <script src="./example.js"></script>
+</body>
+</html>
