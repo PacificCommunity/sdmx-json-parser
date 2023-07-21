@@ -11,6 +11,7 @@ npm install sdmx-json-parser
 ## Usage
 
 SDMX-JSON-parser provides a set of utility function to parse a SDMX-JSON message and extract data arrays.
+When observations are organized in `series` within a `dataSet`, the parser expand them as an array of `observations` concatenating the keys.
 
 
 ```javascript
