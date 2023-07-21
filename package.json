@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/PacificCommunity/sdmx-json-parser/issues"
   },
-  "homepage": "https://github.com/PacificCommunity/sdmx-json-parser#readme",
+  "homepage": "https://pacificcommunity.github.io/sdmx-json-parser/",
   "devDependencies": {
     "jsdoc": "^4.0.2",
     "webpack": "^5.75.0",
