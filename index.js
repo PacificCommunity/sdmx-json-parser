@@ -350,14 +350,14 @@ export class SDMXParser {
     }
     const observations = this.getObservations();
 
-    const incrementalDimensions = this.getDimensions();
+    const dimensions = this.getRawDimensions();
     let res = [];
     for (let key in observations) {
       const keyArray = key.split(":");
       let keyto = {};
 
       keyArray.forEach((_val, index) => {
-        incrementalDimensions.find((val2, _index2) => {
+        dimensions.find((val2, _index2) => {
           if (val2.keyPosition === index) {
             keyto[val2.id] = val2.values[keyArray[index]].name; // need to remove that name and send whole object
             keyto.value = observations[key][0];

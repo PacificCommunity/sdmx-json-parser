@@ -13,6 +13,10 @@
       name: "SPC SDMX (observations)",
       value: "spc_obs",
       url: "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"
+    }, {
+      name: "ILO SDMX (single value)",
+      value: "ilo_single",
+      url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_UNE_DEAP_SEX_AGE_RT,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15?endPeriod=2022&lastNObservations=1"
     }
   ]
 
