@@ -279,7 +279,7 @@ export class SDMXParser {
         });
       }
     });
-    
+
     dimensionKeys.map((val, _index) => {
       val.value.map((val2, index2) => {
         if (options[val.name].includes(val2.id)) {
@@ -351,6 +351,8 @@ export class SDMXParser {
     const observations = this.getObservations();
 
     const dimensions = this.getRawDimensions();
+    const attributes = this.getAttributes();
+
     let res = [];
     for (let key in observations) {
       const keyArray = key.split(":");
@@ -363,6 +365,12 @@ export class SDMXParser {
             keyto.value = observations[key][0];
           }
         });
+      });
+      attributes.forEach((attribute, index) => {
+        const observationKey = observations[key][index + 1];
+        if (observationKey) {
+          keyto[attribute.id] = attribute.values[observationKey]?.name;
+        }
       });
       res.push(keyto);
     }
