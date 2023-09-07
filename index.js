@@ -22,13 +22,17 @@ export class SDMXParser {
    * @param {String} txt  SDMX-JSON response as a string
    * @return {Object} observations
    */
-  parseSeries(txt) {
+  parseSeriesInDatasets(txt) {
     let observations = {};
     try {
       const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*"]});
-      parser.onValue = function (value, key, parent, stack) {
-        Object.keys(value.value.observations).forEach((obskey, i) => {
-          observations[`${value.key}:${obskey}`] = value.value.observations[obskey];
+      parser.onValue = function (jsonValue, key, parent, stack) {
+        Object.keys(jsonValue.value.observations).forEach((obskey, i) => {
+          observations[`${jsonValue.key}:${obskey}`] = jsonValue.value.observations[obskey];
+          // if attributes are present, they are inserted in the observations right after the observation value
+          if(jsonValue.value.attributes){
+            observations[`${jsonValue.key}:${obskey}`].splice(1, 0, ...jsonValue.value.attributes);
+          }
         })
       }
 
@@ -58,7 +62,7 @@ export class SDMXParser {
         );
       }
       const txt = await response.text();
-      const seriesObservations = this.parseSeries(txt);
+      const seriesObservations = this.parseSeriesInDatasets(txt);
       this.getJSON = JSON.parse(txt);
       // if series are present in the response, replace the badly-parsed series with observations extracted by parseSeries
       if (Object.keys(seriesObservations).length > 0) {
@@ -120,7 +124,16 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].attributes
     ) {
-      this.attributes = this.getJSON.data.structures[0].attributes.observation;
+      if (this.getJSON.data.structures[0].attributes.series.length > 0) {
+        this.attributes = this.getJSON.data.structures[0].attributes.series;
+        if (this.getJSON.data.structures[0].attributes.observation.length > 0) {
+          this.attributes = this.attributes.concat(
+            this.getJSON.data.structures[0].attributes.observation
+          )
+        }
+      } else {
+        this.attributes = this.getJSON.data.structures[0].attributes.observation;
+      }
     } else {
       throw new Error("Attributes not found");
     }
@@ -220,6 +233,10 @@ export class SDMXParser {
           const obs_keys = Object.keys(serie.observations);
           obs_keys.forEach((val2, _index2) => {
             this.observations[`${val}:${val2}`] = serie.observations[val2];
+            // add series attributes to observations (at the beginning right after the observation value)
+            if (serie.attributes) {
+              this.observations[`${val}:${val2}`].splice(1, 0, ...serie.attributes);
+            }
           });
         });
       } else if (this.getJSON.data.dataSets[0].observations) {
@@ -367,9 +384,9 @@ export class SDMXParser {
         });
       });
       attributes.forEach((attribute, index) => {
-        const observationKey = observations[key][index + 1];
-        if (observationKey) {
-          keyto[attribute.id] = attribute.values[observationKey]?.name;
+        const observationVal = observations[key][index + 1] || 0;
+        if (attribute.values[observationVal]) {
+          keyto[attribute.id] = attribute.values[observationVal]?.name;
         }
       });
       res.push(keyto);
