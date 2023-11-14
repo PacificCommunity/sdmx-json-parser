@@ -1,3 +1,4 @@
+import { JSONParser } from "@streamparser/json";
 /** Class containing parser data */
 export class SDMXParser {
   /**
@@ -11,6 +12,35 @@ export class SDMXParser {
     this.annotations;
     this.observations;
     this.attributes;
+  }
+
+  /**
+   * This function parses the `series` section.
+   * SDMX-JSON allows duplicate keys which are not supported by JSON.parse
+   * series are expanded to observatoins with a key formed by the series key and the observation key
+   * A JSON Stream parser is used to process the duplicated keys
+   * @param {String} txt  SDMX-JSON response as a string
+   * @return {Object} observations
+   */
+  parseSeriesInDatasets(txt) {
+    let observations = {};
+    try {
+      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*"]});
+      parser.onValue = function (jsonValue, key, parent, stack) {
+        Object.keys(jsonValue.value.observations).forEach((obskey, i) => {
+          observations[`${jsonValue.key}:${obskey}`] = jsonValue.value.observations[obskey];
+          // if attributes are present, they are inserted in the observations right after the observation value
+          if(jsonValue.value.attributes){
+            observations[`${jsonValue.key}:${obskey}`].splice(1, 0, ...jsonValue.value.attributes);
+          }
+        })
+      }
+
+      parser.write(txt);
+    } catch (err) {
+      throw new Error(err);
+    }
+    return observations;
   }
 
   /**
@@ -31,7 +61,14 @@ export class SDMXParser {
           "Error while fetching data please provide valid api url"
         );
       }
-      this.getJSON = await response.json();
+      const txt = await response.text();
+      const seriesObservations = this.parseSeriesInDatasets(txt);
+      this.getJSON = JSON.parse(txt);
+      // if series are present in the response, replace the badly-parsed series with observations extracted by parseSeries
+      if (Object.keys(seriesObservations).length > 0) {
+        this.getJSON.data.dataSets[0].observations = seriesObservations;
+        delete this.getJSON.data.dataSets[0].series;
+      }
     } catch (err) {
       throw new Error(err);
     }
@@ -87,7 +124,16 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].attributes
     ) {
-      this.attributes = this.getJSON.data.structures[0].attributes.observation;
+      if (this.getJSON.data.structures[0].attributes.series.length > 0) {
+        this.attributes = this.getJSON.data.structures[0].attributes.series;
+        if (this.getJSON.data.structures[0].attributes.observation.length > 0) {
+          this.attributes = this.attributes.concat(
+            this.getJSON.data.structures[0].attributes.observation
+          )
+        }
+      } else {
+        this.attributes = this.getJSON.data.structures[0].attributes.observation;
+      }
     } else {
       throw new Error("Attributes not found");
     }
@@ -107,7 +153,16 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].dimensions
     ) {
-      this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
+      if (this.getJSON.data.structures[0].dimensions.series.length > 0) {
+        this.dimensions = this.getJSON.data.structures[0].dimensions.series;
+        if (this.getJSON.data.structures[0].dimensions.observation.length > 0) {
+          this.dimensions = this.dimensions.concat(
+            this.getJSON.data.structures[0].dimensions.observation
+          )
+        }
+      } else {
+        this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
+      }
     } else {
       throw new Error("Dimensions not found");
     }
@@ -166,12 +221,29 @@ export class SDMXParser {
     if (
       this.getJSON &&
       this.getJSON.data &&
-      this.getJSON.data.dataSets &&
-      this.getJSON.data.dataSets[0].observations
+      this.getJSON.data.dataSets
     ) {
-      this.observations = this.getJSON.data.dataSets[0].observations;
-    } else {
-      throw new Error("Observations not found");
+      if (this.getJSON.data.dataSets[0].series) {
+        this.observations = {};
+        const series = this.getJSON.data.dataSets[0].series;
+
+        let seriesKeys = Object.keys(series);
+        seriesKeys.forEach((val, _index) => {
+          const serie = series[val];
+          const obs_keys = Object.keys(serie.observations);
+          obs_keys.forEach((val2, _index2) => {
+            this.observations[`${val}:${val2}`] = serie.observations[val2];
+            // add series attributes to observations (at the beginning right after the observation value)
+            if (serie.attributes) {
+              this.observations[`${val}:${val2}`].splice(1, 0, ...serie.attributes);
+            }
+          });
+        });
+      } else if (this.getJSON.data.dataSets[0].observations) {
+        this.observations = this.getJSON.data.dataSets[0].observations;
+      } else {
+        throw new Error("Series not found and observations empty");
+      }
     }
     return this.observations;
   }
@@ -295,8 +367,7 @@ export class SDMXParser {
     }
     const observations = this.getObservations();
 
-    const incrementalDimensions = this.getDimensions();
-
+    const dimensions = this.getRawDimensions();
     const attributes = this.getAttributes();
 
     let res = [];
@@ -305,7 +376,7 @@ export class SDMXParser {
       let keyto = {};
 
       keyArray.forEach((_val, index) => {
-        incrementalDimensions.find((val2, _index2) => {
+        dimensions.find((val2, _index2) => {
           if (val2.keyPosition === index) {
             keyto[val2.id] = val2.values[keyArray[index]].name; // need to remove that name and send whole object
             keyto.value = observations[key][0];
@@ -313,9 +384,9 @@ export class SDMXParser {
         });
       });
       attributes.forEach((attribute, index) => {
-        const observationKey = observations[key][index + 1];
-        if (observationKey) {
-          keyto[attribute.id] = attribute.values[observationKey]?.name;
+        const observationVal = observations[key][index + 1] || 0;
+        if (attribute.values[observationVal]) {
+          keyto[attribute.id] = attribute.values[observationVal]?.name;
         }
       });
       res.push(keyto);
