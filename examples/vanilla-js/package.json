@@ -5,7 +5,7 @@
   "main": "example.js",
   "type": "module",
   "scripts": {
-    "server":"cp -R ../../dist . && serve ../vanilla-js",
+    "server": "cp -R ../../dist . && serve ../vanilla-js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,5 +14,8 @@
   "dependencies": {
     "live-server": "^1.2.2",
     "serve": "^14.2.0"
+  },
+  "devDependencies": {
+    "source-map-loader": "^4.0.1"
   }
 }
