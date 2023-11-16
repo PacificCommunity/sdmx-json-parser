@@ -21,16 +21,23 @@ const sdmxDataUrl = "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_I
 
 const parser = new SDMXParser();
 await parser.getDataset(sdmxDataUrl);
-name = parser.getName();
-description = parser.getDescription();
-allDimensions = sdmxDataset.getRawDimensions();
-dimensions = sdmxDataset.getDimensions();
-annotations = sdmxDataset.getAnnotations();
-observations = sdmxDataset.getObservations();
-slice = sdmx.slice({GEO_PICT: ['NR']}); // slice by dimension Id (GEO_PICT) values (['NR'])
+const name = parser.getName();
+const description = parser.getDescription();
+const dimensions = parser.getActiveDimensions();
+const activeDimensions = parser.getDimensions();
+const annotations = parser.getAnnotations();
+const observations = parser.getObservations();
 
+data = sdmx.getData(); // returns a simplified array of observations with dimension and attributes values
+const slicedData = parser.getData({GEO_PICT: ['NR']}); // slice by dimension Id (GEO_PICT) values (['NR'])
+```
 
-data = sdmx.getData(); // returns a simplified array of observations with dimension values
+## Example
+
+Go to `examples/vanilla-js` folder and run a local server to see the example.
+
+```bash
+npm run server
 ```
 
 ## Developer
