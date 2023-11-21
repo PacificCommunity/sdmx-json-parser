@@ -38,31 +38,36 @@
     await resp.getDatasets(
       selectedSample.url
     );
-    let res = resp.getData();
-    console.log("🚀 ~ file: example.js:38 ~ res:", res);
+    const data = resp.getData();
+    console.log("🚀 getData():", data);
 
-    let observations = resp.getObservations();
-    console.log("🚀 ~ file: example.js:41 ~ observations", observations);
+    const observations = resp.getObservations();
+    console.log("🚀 getObservations()", observations);
 
-    let dimensions = resp.getDimensions();
-    console.log("🚀 ~ file: example.js:44 ~ dimensions", dimensions);
+    const dimensions = resp.getDimensions();
+    console.log("🚀 getDimensions()", dimensions);
 
-    let attributes = resp.getAttributes();
-    console.log("🚀 ~ file: example.js:47 ~ attributes", attributes);
+    const id = dimensions[0]['id'];
+    const dimension = resp.getDimension(id);
+    console.log(`🚀 getDimension(${id})`, dimension);
 
-    let rawDimensions = resp.getRawDimensions();
-    console.log("🚀 ~ file: example.js:50 ~ rawDimensions", rawDimensions);
+    const activeDimensions = resp.getActiveDimensions();
+    console.log("🚀 getActiveDimensions()", activeDimensions);
 
-    let name = resp.getName();
-    console.log("🚀 ~ file: example.js:53 ~ name", name);
+    const attributes = resp.getAttributes();
+    console.log("🚀 getAttributes()", attributes);
 
-    let description = resp.getDescription();
-    console.log("🚀 ~ file: example.js:56 ~ description", description);
+    const name = resp.getName();
+    console.log("🚀 getName()", name);
 
-    let annotations = resp.getAnnotations();
-    console.log("🚀 ~ file: example.js:59 ~ annotations", annotations);
+    const description = resp.getDescription();
+    console.log("🚀 getDescription()", description);
 
-    let slice = resp.slice({ [dimensions[0]['id']]: dimensions[0]["values"].map(item => item.id).slice(0, 2) });
-    console.log("🚀 ~ file: example.js:62 ~ slice:", slice);
+    const annotations = resp.getAnnotations();
+    console.log("🚀 getAnnotations()", annotations);
+
+    const filter = { [activeDimensions[0]['id']]: activeDimensions[0]["values"].map(item => item.name).slice(0, 2) }
+    const slice = resp.getData(filter);
+    console.log(`🚀 getData(${JSON.stringify(filter)}):`, slice);
   }
 })();
