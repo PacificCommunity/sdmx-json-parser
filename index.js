@@ -87,7 +87,7 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].names
     ) {
-      this.name = this.getJSON.data.structures[0].names.en;
+      this.name = this.getJSON.data.structures[0].name;
     } else {
       throw new Error("Name not found");
     }
@@ -106,7 +106,7 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].descriptions
     ) {
-      this.descriptions = this.getJSON.data.structures[0].descriptions.en;
+      this.descriptions = this.getJSON.data.structures[0].description;
     } else {
       throw new Error("Description not found");
     }
@@ -125,15 +125,12 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].attributes
     ) {
+      this.attributes = this.getJSON.data.structures[0].attributes.observation;
       if (this.getJSON.data.structures[0].attributes.series.length > 0) {
-        this.attributes = this.getJSON.data.structures[0].attributes.series;
-        if (this.getJSON.data.structures[0].attributes.observation.length > 0) {
-          this.attributes = this.attributes.concat(
-            this.getJSON.data.structures[0].attributes.observation
-          )
-        }
-      } else {
-        this.attributes = this.getJSON.data.structures[0].attributes.observation;
+        this.attributes = this.getJSON.data.structures[0].attributes.series.concat(this.attributes)
+      }
+      if (this.getJSON.data.structures[0].attributes.dataSet.length > 0) {
+        this.attributes = this.getJSON.data.structures[0].attributes.dataSet.concat(this.attributes)
       }
     } else {
       throw new Error("Attributes not found");
@@ -154,15 +151,12 @@ export class SDMXParser {
       this.getJSON.data.structures[0] &&
       this.getJSON.data.structures[0].dimensions
     ) {
+      this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
       if (this.getJSON.data.structures[0].dimensions.series.length > 0) {
-        this.dimensions = this.getJSON.data.structures[0].dimensions.series;
-        if (this.getJSON.data.structures[0].dimensions.observation.length > 0) {
-          this.dimensions = this.dimensions.concat(
-            this.getJSON.data.structures[0].dimensions.observation
-          )
-        }
-      } else {
-        this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
+        this.dimensions = this.getJSON.data.structures[0].dimensions.series.concat(this.dimensions)
+      }
+      if (this.getJSON.data.structures[0].dimensions.dataSet.length > 0) {
+        this.dimensions = this.getJSON.data.structures[0].dimensions.dataSet.concat(this.dimensions)
       }
     } else {
       throw new Error("Dimensions not found");

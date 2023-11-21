@@ -17,6 +17,10 @@
       name: "ILO SDMX (single value)",
       value: "ilo_single",
       url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_UNE_DEAP_SEX_AGE_RT,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15?endPeriod=2022&lastNObservations=1"
+    }, {
+      name: "Uruguay SDMX (dimensions dataSet level)",
+      value: "uy_dataset",
+      url: "https://sdmx-mtss.simel.mtss.gub.uy/rest/data/UY110,DF_MFAUN_CCSS,1.0/.A.._T?lastNObservations=1&format=jsondata"
     }
   ]
 
@@ -34,40 +38,98 @@
   async function handleSelectChange() {
     const selectedValue = document.getElementById("sample-select").value;
     const selectedSample = test_samples.find(sample => sample.value === selectedValue);
-    console.log(`🚀 ${selectedSample.name}`);
+    console.log(`🚀🚀🚀 ${selectedSample.name}`);
     await resp.getDatasets(
       selectedSample.url
     );
-    const data = resp.getData();
-    console.log("🚀 getData():", data);
+    try {
+      const data = resp.getData();
+      console.log("🚀 getData():", data);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const observations = resp.getObservations();
-    console.log("🚀 getObservations()", observations);
+    try {
+      const observations = resp.getObservations();
+      console.log("🚀 getObservations()", observations);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const dimensions = resp.getDimensions();
-    console.log("🚀 getDimensions()", dimensions);
+    try {
+      const dimensions = resp.getDimensions();
+      console.log("🚀 getDimensions()", dimensions);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const id = dimensions[0]['id'];
-    const dimension = resp.getDimension(id);
-    console.log(`🚀 getDimension(${id})`, dimension);
+    try {
+      const dimensions = resp.getDimensions();
+      if (dimensions.length === 0) {
+        return;
+      }
+      const id = dimensions[0]['id'];
+      const dimension = resp.getDimension(id);
+      console.log(`🚀 getDimension(${id})`, dimension);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const activeDimensions = resp.getActiveDimensions();
-    console.log("🚀 getActiveDimensions()", activeDimensions);
+    try {
+      const activeDimensions = resp.getActiveDimensions();
+      console.log("🚀 getActiveDimensions()", activeDimensions);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const attributes = resp.getAttributes();
-    console.log("🚀 getAttributes()", attributes);
+    try {
+      const attributes = resp.getAttributes();
+      console.log("🚀 getAttributes()", attributes);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const name = resp.getName();
-    console.log("🚀 getName()", name);
+    try {
+      const name = resp.getName();
+      console.log("🚀 getName()", name);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const description = resp.getDescription();
-    console.log("🚀 getDescription()", description);
+    try {
+      const description = resp.getDescription();
+      console.log("🚀 getDescription()", description);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const annotations = resp.getAnnotations();
-    console.log("🚀 getAnnotations()", annotations);
+    try {
+      const annotations = resp.getAnnotations();
+      console.log("🚀 getAnnotations()", annotations);
+    }
+    catch (error) {
+      console.log(error);
+    }
 
-    const filter = { [activeDimensions[0]['id']]: activeDimensions[0]["values"].map(item => item.name).slice(0, 2) }
-    const slice = resp.getData(filter);
-    console.log(`🚀 getData(${JSON.stringify(filter)}):`, slice);
+    try {
+      const activeDimensions = resp.getActiveDimensions();
+      if (activeDimensions.length === 0) {
+        return;
+      }
+      const filter = { [activeDimensions[0]['id']]: activeDimensions[0]["values"].map(item => item.name).slice(0, 2) }
+      const slice = resp.getData(filter);
+      console.log(`🚀 getData(${JSON.stringify(filter)}):`, slice);
+    }
+    catch (error) {
+      console.log(error);
+    }
   }
 })();
