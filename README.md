@@ -11,6 +11,10 @@ npm install sdmx-json-parser
 ## Usage
 
 SDMX-JSON-parser provides a set of utility function to parse a SDMX-JSON message and extract data arrays.
+
+The method `getDataset` must be called prior to using any other method. It takes a SDMX REST URL as first parameter and an optional `fetchOptions` object as second parameter ([doc](https://developer.mozilla.org/en-US/docs/Web/API/fetch#options)). This fetch options can be used for instance to pass custom headers to the request like `Accept-language` to select the response language.
+
+Every SDMX concepts (observation, dimensions, attributes) are given at observation level in the different methods (getData, getAttributes, getDimensions).
 When observations are organized in `series` within a `dataSet`, the parser expand them as an array of `observations` concatenating the keys.
 
 
