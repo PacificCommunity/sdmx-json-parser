@@ -1,5 +1,5 @@
-export async function getMultiLineChart(data, xAxis, yAxis = "value", legend) {
-  const seriesData = data.reduce((acc, cur) => {
+export async function getMultiLineChart(data: any[], xAxis: string, yAxis = "value", legend: string = "") {
+  const seriesData = data.reduce((acc: any[], cur) => {
     const existingRecord = acc.find((item) => {
       return item.name === cur[legend];
     });
@@ -16,7 +16,7 @@ export async function getMultiLineChart(data, xAxis, yAxis = "value", legend) {
 
   const xAxisValue = [
     ...new Set(
-      data.reduce((acc, cur) => {
+      data.reduce((acc: any[], cur) => {
         const existingRecord = acc.find((item) => item.name === cur[xAxis]);
         if (existingRecord) {
           existingRecord.push(cur[xAxis]);
@@ -31,7 +31,7 @@ export async function getMultiLineChart(data, xAxis, yAxis = "value", legend) {
   return [seriesData, xAxisValue];
 }
 
-export async function getLineChart(data, xAxis, yAxis = "value") {
+export async function getLineChart(data: any[], xAxis: string, yAxis = "value") {
   const yAxisValue = data.map((val) => {
     return val[yAxis];
   });
@@ -40,19 +40,19 @@ export async function getLineChart(data, xAxis, yAxis = "value") {
   return [yAxisValue, xAxisValue];
 }
 
-export async function getColumnChart(data, xAxis, yAxis = "value", legend) {
+export async function getColumnChart(data: any[], xAxis: string, yAxis = "value") {
   const yAxisValue = data.map((val) => val[yAxis]);
   const xAxisValue = data.map((val) => val[xAxis]);
   return [yAxisValue, xAxisValue];
 }
 
 export async function getMultiColumnChart(
-  data,
-  xAxis,
+  data: any[],
+  xAxis: string,
   yAxis = "value",
-  legend
+  legend: string = ""
 ) {
-  const arr = data.reduce((acc, cur) => {
+  const arr = data.reduce((acc: any[], cur) => {
     const existingRecord = acc.find((item) => item.name === cur[xAxis]);
     if (existingRecord) {
       existingRecord.push(cur[xAxis]);
@@ -63,10 +63,10 @@ export async function getMultiColumnChart(
   }, []);
   const xAxisValue = [...new Set(arr)];
 
-  let seriesData = [];
+  let seriesData: any[] = [];
 
-  const group = xAxisValue.map((m, i) => {
-    seriesData = data.reduce((acc, cur, index) => {
+  xAxisValue.map((m,) => {
+    seriesData = data.reduce((acc: any[], cur,) => {
       const existingRecord = acc.find((item) => item.name === cur[legend]);
       if (m === cur[xAxis]) {
         if (existingRecord) {
@@ -86,7 +86,7 @@ export async function getMultiColumnChart(
   return [seriesData, xAxisValue];
 }
 
-export async function getPieChart(data, yAxis = "value", legend) {
+export async function getPieChart(data: any[], yAxis = "value", legend: string = "") {
   const seriesData = data.map((val) => {
     return { name: val[legend], y: val[yAxis] };
   });
@@ -94,16 +94,16 @@ export async function getPieChart(data, yAxis = "value", legend) {
 }
 
 export async function getPyramidChart(
-  data,
-  xAxis,
-  yAxis,
-  legend,
+  data: any[],
+  xAxis: string,
+  yAxis: string,
+  legend: string = "",
   year = "2016"
 ) {
-  let seriesData = [];
-  data.map((val, _index) => {
+  const seriesData: any[] = [];
+  data.map((val,) => {
     if (val.TIME_PERIOD === year) {
-      const existingRecord = seriesData.find((item) => {
+      const existingRecord = seriesData.find((item: any) => {
         return item.name === val[legend];
       });
       if (existingRecord) {
@@ -120,7 +120,7 @@ export async function getPyramidChart(
 
   const xAxisValue = [
     ...new Set(
-      data.reduce((acc, cur) => {
+      data.reduce((acc: any[], cur) => {
         const existingRecord = acc.find((item) => item.name === cur[xAxis]);
         if (existingRecord) {
           existingRecord.push(cur[xAxis]);
@@ -135,19 +135,15 @@ export async function getPyramidChart(
   return [seriesData, xAxisValue];
 }
 
-export async function getLollipopChart(data, xAxis, yAxis = "value", legend) {
-  const datas = data.reduce((acc, cur) => {
-    const existingRecord = acc.find((item) => {
+export async function getLollipopChart(data: any[], xAxis: string, yAxis = "value", legend: string = "") {
+  const datas = data.reduce((acc: any[], cur) => {
+    acc.find((item: any) => {
       return item.name === cur[xAxis];
     });
-    if (existingRecord) {
-      existingRecord.y < cur[yAxis] && (existingRecord.y = cur[yAxis]);
-    } else {
-      acc.push({
-        name: cur[xAxis],
-        y: !cur[yAxis] ? 0 : cur[yAxis],
-      });
-    }
+    acc.push({
+      name: cur[xAxis],
+      y: !cur[yAxis] ? 0 : cur[yAxis],
+    });
     return acc;
   }, []);
   const seriesData = [{ name: legend, data: datas }];
@@ -157,9 +153,9 @@ export async function getLollipopChart(data, xAxis, yAxis = "value", legend) {
 export async function getHighChartsData(
   data = [],
   chartType = "line",
-  xAxis,
-  yAxis,
-  legend
+  xAxis: string,
+  yAxis: string,
+  legend?: string
 ) {
   if (!data.length) {
     throw new Error("No Data Found Please Provide The Data");
@@ -185,5 +181,7 @@ export async function getHighChartsData(
 
     case "lollipop":
       return await getLollipopChart(data, xAxis, yAxis, legend);
+    default:
+      throw new Error("Chart Type Not Supported");
   }
 }
