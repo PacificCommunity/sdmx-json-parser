@@ -27,8 +27,8 @@ const parser = new SDMXParser();
 await parser.getDataset(sdmxDataUrl);
 const name = parser.getName();
 const description = parser.getDescription();
-const dimensions = parser.getActiveDimensions();
-const activeDimensions = parser.getDimensions();
+const dimensions = parser.getDimensions();
+const activeDimensions = parser.getActiveDimensions();
 const annotations = parser.getAnnotations();
 const observations = parser.getObservations();
 
