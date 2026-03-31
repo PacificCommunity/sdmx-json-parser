@@ -293,13 +293,15 @@ export class SDMXParser {
     let res = [];
     for (let key in observations) {
       const keyArray = key.split(":");
-      let keyto = {};
+      // the keyto object will contain the value of the observation and the dimensions and attributes values with their name
+      const keyto = {
+        value: observations[key][0],
+      };
 
       keyArray.forEach((_val, index) => {
         dimensions.find((val2, _index2) => {
           if (val2.keyPosition === index) {
             keyto[val2.id] = val2.values[keyArray[index]].name; // need to remove that name and send whole object
-            keyto.value = observations[key][0];
           }
         });
       });
