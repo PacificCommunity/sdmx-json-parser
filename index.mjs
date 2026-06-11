@@ -25,7 +25,10 @@ export class SDMXParser {
   parseSeriesInDatasets(txt) {
     let observations = {};
     try {
-      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*"]});
+      // Two paths: SDMX-JSON 2.0 (and .Stat-flavoured 1.0) carry dataSets
+      // inside a `data` envelope; the SDMX-JSON 1.0 root dialect (e.g. ECB)
+      // carries dataSets at the document root. A response matches one only.
+      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*", "$.dataSets.*.series.*"]});
       parser.onValue = function (jsonValue, key, parent, stack) {
         Object.keys(jsonValue.value.observations).forEach((obskey, i) => {
           observations[`${jsonValue.key}:${obskey}`] = jsonValue.value.observations[obskey];
@@ -54,7 +57,7 @@ export class SDMXParser {
   async getDatasets(api, options = {}) {
     try {
       if (!api.includes("format=jsondata")) {
-        api = `${api}&format=jsondata`;
+        api = `${api}${api.includes("?") ? "&" : "?"}format=jsondata`;
       }
       const response = await fetch(api, options);
       if (response.status !== 200) {
@@ -64,7 +67,7 @@ export class SDMXParser {
       }
       const txt = await response.text();
       const seriesObservations = this.parseSeriesInDatasets(txt);
-      this.getJSON = JSON.parse(txt);
+      this.getJSON = SDMXParser.normalizeSdmxJson(JSON.parse(txt));
       // if series are present in the response, replace the badly-parsed series with observations extracted by parseSeries
       if (Object.keys(seriesObservations).length > 0) {
         this.getJSON.data.dataSets[0].observations = seriesObservations;
@@ -74,6 +77,79 @@ export class SDMXParser {
       throw new Error(err);
     }
     return this.getJSON;
+  }
+
+  /**
+   * Normalise an SDMX-JSON response into the SDMX-JSON 2.0 shape this parser
+   * reads. Two 1.0 dialects show up in the wild when `format=jsondata` is in
+   * the URL (which getDatasets appends):
+   *
+   *  - .Stat instances (e.g. Pacific Data Hub, Samoa Bureau of Statistics on
+   *    current NSI builds) return a `data` envelope with a singular
+   *    `structure` object instead of a `structures` array;
+   *  - ECB returns `structure` and `dataSets` at the document root, with no
+   *    `data` envelope at all.
+   *
+   * 2.0 responses pass through untouched, so the call is idempotent. The
+   * object is mutated in place and returned for convenience.
+   * @param {Object} json parsed SDMX-JSON response
+   * @return {Object} the same object, in SDMX-JSON 2.0 shape
+   */
+  static normalizeSdmxJson(json) {
+    if (!json || typeof json !== "object") {
+      return json;
+    }
+    // SDMX-JSON 1.0 root dialect: wrap root keys into a `data` envelope.
+    if (!json.data && json.dataSets) {
+      json.data = { dataSets: json.dataSets };
+      delete json.dataSets;
+      if (json.structure) {
+        json.data.structure = json.structure;
+        delete json.structure;
+      }
+    }
+    const data = json.data;
+    if (!data) {
+      return json;
+    }
+    // SDMX-JSON 1.0 envelope: singular `structure` instead of `structures`.
+    if (data.structure && !data.structures) {
+      data.structures = [data.structure];
+      delete data.structure;
+    }
+    const structure = data.structures && data.structures[0];
+    if (structure) {
+      // 1.0 may carry singular `name`/`description` only; 2.0 pairs them
+      // with localised `names`/`descriptions`, which getName() and
+      // getDescription() check for. Synthesise the plural when only the
+      // singular is present.
+      if (structure.name && !structure.names) {
+        structure.names = { en: structure.name };
+      }
+      if (structure.description && !structure.descriptions) {
+        structure.descriptions = { en: structure.description };
+      }
+      if (structure.dimensions) {
+        // 1.0 uses lowercase `dataset`.
+        if (structure.dimensions.dataset && !structure.dimensions.dataSet) {
+          structure.dimensions.dataSet = structure.dimensions.dataset;
+          delete structure.dimensions.dataset;
+        }
+        ["dataSet", "series", "observation"].forEach((group) => {
+          if (!structure.dimensions[group]) {
+            structure.dimensions[group] = [];
+          }
+        });
+      }
+      if (structure.attributes) {
+        ["dataSet", "dimensionGroup", "series", "observation"].forEach((group) => {
+          if (!structure.attributes[group]) {
+            structure.attributes[group] = [];
+          }
+        });
+      }
+    }
+    return json;
   }
 
   /**
