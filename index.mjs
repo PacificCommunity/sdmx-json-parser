@@ -51,7 +51,12 @@ export class SDMXParser {
    * This function gets api url in parameter and generates the SDMX-JSON dataSet from the api
    * If the response contains series, the series are expanded to observations
    * @param {String} api URL of the SDMX api
-   * @param {Object} Options Request options used while fetching (optional)
+   * @param {Object} Options Request options used while fetching (optional).
+   * The non-standard key `fetcher` accepts a function with the fetch
+   * signature `(url, init) => Promise<Response>`; when provided, every
+   * request goes through it instead of the global fetch, so consumers can
+   * add authentication, proxying, caching, or retries. The remaining keys
+   * are passed to the fetch call as its init object.
    * @return {Array} SDMX-JSON response
    */
   async getDatasets(api, options = {}) {
@@ -59,7 +64,8 @@ export class SDMXParser {
       if (!api.includes("format=jsondata")) {
         api = `${api}${api.includes("?") ? "&" : "?"}format=jsondata`;
       }
-      const response = await fetch(api, options);
+      const { fetcher, ...init } = options;
+      const response = await (fetcher || fetch)(api, init);
       if (response.status !== 200) {
         throw new Error(
           "Error while fetching data please provide valid api url"
