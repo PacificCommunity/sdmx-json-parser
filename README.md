@@ -38,7 +38,7 @@ const slicedData = parser.getData({GEO_PICT: ['NR']}); // slice by dimension Id 
 
 ## Example
 
-Go to `examples/vanilla-js` folder and run a local server to see the example.
+Go to `examples` folder and run a local server to see the example.
 
 ```bash
 npm run server

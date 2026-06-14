@@ -5,7 +5,7 @@
   "main": "example.js",
   "type": "module",
   "scripts": {
-    "server": "cp -R ../../dist . && serve ../vanilla-js",
+    "server": "cp -R ../dist . && serve .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

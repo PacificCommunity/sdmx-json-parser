@@ -2,31 +2,41 @@
   const SDMXParser = parser.SDMXParser;
   const resp = new SDMXParser();
   const test_samples = [{
-      name: "ILO SDMX (observations)",
-      value: "ilo_obs",
-      languages: ["en", "fr"],
-      url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_EMP_TEMP_SEX_AGE_STE_NB,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15.STE_ICSE93_6+STE_ICSE93_5+STE_ICSE93_4+STE_ICSE93_3+STE_ICSE93_2+STE_ICSE93_1?endPeriod=2022&lastNObservations=1&format=jsondata"
-    }, {
-      name: "ILO SDMX (series)",
-      value: "ilo_ser",
-      languages: ["en", "fr"],
-      url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_EAP_DWAP_SEX_AGE_RT,1.0/CHL.A..SEX_O+SEX_F+SEX_M+SEX_T.AGE_YTHADULT_YGE15?startPeriod=2010&endPeriod=2022"
-    }, {
-      name: "SPC SDMX (observations)",
-      value: "spc_obs",
-      languages: ["en", "fr"],
-      url: "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"
-    }, {
-      name: "ILO SDMX (single value)",
-      value: "ilo_single",
-      languages: ["en", "fr"],
-      url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_UNE_DEAP_SEX_AGE_RT,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15?endPeriod=2022&lastNObservations=1"
-    }, {
-      name: "Uruguay SDMX (dimensions dataSet level)",
-      value: "uy_dataset",
-      languages: ["es"],
-      url: "https://sdmx-mtss.simel.mtss.gub.uy/rest/data/UY110,DF_MFAUN_CCSS,1.0/.A.._T?lastNObservations=1&format=jsondata"
-    }
+    name: "ILO SDMX (observations)",
+    value: "ilo_obs",
+    languages: ["en", "fr"],
+    url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_EMP_TEMP_SEX_AGE_STE_NB,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15.STE_ICSE93_6+STE_ICSE93_5+STE_ICSE93_4+STE_ICSE93_3+STE_ICSE93_2+STE_ICSE93_1?endPeriod=2022&lastNObservations=1&format=jsondata"
+  }, {
+    name: "ILO SDMX (series)",
+    value: "ilo_ser",
+    languages: ["en", "fr"],
+    url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_EAP_DWAP_SEX_AGE_RT,1.0/CHL.A..SEX_O+SEX_F+SEX_M+SEX_T.AGE_YTHADULT_YGE15?startPeriod=2010&endPeriod=2022"
+  }, {
+    name: "SPC SDMX (observations)",
+    value: "spc_obs",
+    languages: ["en", "fr"],
+    url: "https://stats-nsi-stable.pacificdata.org/rest/data/SPC,DF_VAW,1.0/A..VAW_TOPIC_001......PARTNER.ALOLIFE.....?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata"
+  }, {
+    name: "ILO SDMX (single value)",
+    value: "ilo_single",
+    languages: ["en", "fr"],
+    url: "https://www.ilo.org/sdmx/rest/data/ILO,DF_UNE_DEAP_SEX_AGE_RT,1.0/CHL.A..SEX_T.AGE_YTHADULT_YGE15?endPeriod=2022&lastNObservations=1"
+  }, {
+    name: "Uruguay SDMX (dimensions dataSet level)",
+    value: "uy_dataset",
+    languages: ["es"],
+    url: "https://sdmx-mtss.simel.mtss.gub.uy/rest/data/UY110,DF_MFAUN_CCSS,1.0/.A.._T?lastNObservations=1&format=jsondata"
+  }, {
+    name: "Test SDMX-JSON v1",
+    value: "test_v1",
+    languages: ["en"],
+    url: `${location.href}test_v1.json`
+  }, {
+    name: "Test SDMX-JSON v2",
+    value: "test_v2",
+    languages: ["en"],
+    url: `${location.href}test_v2.json`
+  }
   ]
 
   const select_sample = document.getElementById("sample-select");
@@ -44,7 +54,7 @@
 
     const selectedValue = document.getElementById("sample-select").value;
     const selectedSample = test_samples.find(sample => sample.value === selectedValue);
-    
+
     const language_select = document.getElementById("language-select");
     // clear select options
     language_select.innerHTML = "";

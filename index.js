@@ -53,7 +53,7 @@ export class SDMXParser {
    */
   async getDatasets(api, options = {}) {
     try {
-      if (!api.includes("format=jsondata")) {
+      if (!api.endsWith(".json") && !api.includes("format=jsondata")) {
         api = `${api}&format=jsondata`;
       }
       const response = await fetch(api, options);
@@ -77,20 +77,33 @@ export class SDMXParser {
   }
 
   /**
+   * Get the structure from the SDMX-JSON response
+   * @return {Object} Structure of the dataset
+   */
+  getStructure() {
+    if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structure
+    ) {
+      return this.getJSON.data.structure;
+    } else if (
+      this.getJSON &&
+      this.getJSON.data &&
+      this.getJSON.data.structures[0]
+    ) {
+      return this.getJSON.data.structures[0];
+    } else {
+      throw new Error("Structure not found");
+    }
+  }
+
+  /**
    * Get the name or title from the SDMX-JSON response
    * @return {String} Name or Title from the dataset
    */
   getName() {
-    if (
-      this.getJSON &&
-      this.getJSON.data &&
-      this.getJSON.data.structures[0] &&
-      this.getJSON.data.structures[0].names
-    ) {
-      this.name = this.getJSON.data.structures[0].name;
-    } else {
-      throw new Error("Name not found");
-    }
+    this.name = this.getStructure().name;
 
     return this.name;
   }
@@ -100,16 +113,7 @@ export class SDMXParser {
    * @return {String} Description or Subtitle of the dataset
    */
   getDescription() {
-    if (
-      this.getJSON &&
-      this.getJSON.data &&
-      this.getJSON.data.structures[0] &&
-      this.getJSON.data.structures[0].descriptions
-    ) {
-      this.descriptions = this.getJSON.data.structures[0].description;
-    } else {
-      throw new Error("Description not found");
-    }
+    this.descriptions = this.getStructure().description;
 
     return this.descriptions;
   }
@@ -119,18 +123,13 @@ export class SDMXParser {
    * @return {Array} Attributes of the dataset
    */
   getAttributes() {
-    if (
-      this.getJSON &&
-      this.getJSON.data &&
-      this.getJSON.data.structures[0] &&
-      this.getJSON.data.structures[0].attributes
-    ) {
-      this.attributes = this.getJSON.data.structures[0].attributes.observation;
-      if (this.getJSON.data.structures[0].attributes.series.length > 0) {
-        this.attributes = this.getJSON.data.structures[0].attributes.series.concat(this.attributes)
+    if (this.getStructure().dimensions) {
+      this.attributes = this.getStructure().attributes.observation;
+      if (this.getStructure().attributes.series && this.getStructure().attributes.series.length > 0) {
+        this.attributes = this.getStructure().attributes.series.concat(this.attributes)
       }
-      if (this.getJSON.data.structures[0].attributes.dataSet.length > 0) {
-        this.attributes = this.getJSON.data.structures[0].attributes.dataSet.concat(this.attributes)
+      if (this.getStructure().attributes.dataSet && this.getStructure().attributes.dataSet.length > 0) {
+        this.attributes = this.getStructure().attributes.dataSet.concat(this.attributes)
       }
     } else {
       throw new Error("Attributes not found");
@@ -145,18 +144,13 @@ export class SDMXParser {
    * @return {Array} Dimensions of the dataset in SDMX-JSON response
    */
   getDimensions() {
-    if (
-      this.getJSON &&
-      this.getJSON.data &&
-      this.getJSON.data.structures[0] &&
-      this.getJSON.data.structures[0].dimensions
-    ) {
-      this.dimensions = this.getJSON.data.structures[0].dimensions.observation;
-      if (this.getJSON.data.structures[0].dimensions.series.length > 0) {
-        this.dimensions = this.getJSON.data.structures[0].dimensions.series.concat(this.dimensions)
+    if (this.getStructure().dimensions) {
+      this.dimensions = this.getStructure().dimensions.observation;
+      if (this.getStructure().dimensions.series && this.getStructure().dimensions.series.length > 0) {
+        this.dimensions = this.getStructure().dimensions.series.concat(this.dimensions)
       }
-      if (this.getJSON.data.structures[0].dimensions.dataSet.length > 0) {
-        this.dimensions = this.getJSON.data.structures[0].dimensions.dataSet.concat(this.dimensions)
+      if (this.getStructure().dimensions.dataSet && this.getStructure().dimensions.dataSet.length > 0) {
+        this.dimensions = this.getStructure().dimensions.dataSet.concat(this.dimensions)
       }
     } else {
       throw new Error("Dimensions not found");
@@ -260,16 +254,7 @@ export class SDMXParser {
    * @return {Array} Annotations of the dataset in SDMX-JSON response
    */
   getAnnotations() {
-    if (
-      this.getJSON &&
-      this.getJSON.data &&
-      this.getJSON.data.structures[0] &&
-      this.getJSON.data.structures[0].annotations
-    ) {
-      this.annotations = this.getJSON.data.structures[0].annotations;
-    } else {
-      throw new Error("Annotations not found");
-    }
+    this.annotations = this.getStructure().annotations;
 
     return this.annotations;
   }
