@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "live-server": "^1.2.2",
     "serve": "^14.2.0"
   },
   "devDependencies": {
