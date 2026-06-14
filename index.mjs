@@ -146,6 +146,24 @@ export class SDMXParser {
             structure.dimensions[group] = [];
           }
         });
+        // The 1.0 root dialect (ECB) omits keyPosition on every dimension.
+        // getData and getActiveDimensions locate a dimension by matching its
+        // keyPosition against the index in the observation key, so without it
+        // no dimension is attached to the parsed rows. Synthesise it from the
+        // dimension order: series dimensions fill the leading key positions,
+        // the observation dimension(s) follow, which is exactly how the
+        // series-expansion key (seriesKey:obsKey) is laid out. Only fill gaps
+        // so responses that already carry keyPosition (2.0, .Stat) are
+        // untouched, keeping the call idempotent.
+        let keyPosition = 0;
+        ["series", "observation"].forEach((group) => {
+          structure.dimensions[group].forEach((dimension) => {
+            if (dimension.keyPosition === undefined) {
+              dimension.keyPosition = keyPosition;
+            }
+            keyPosition++;
+          });
+        });
       }
       if (structure.attributes) {
         ["dataSet", "dimensionGroup", "series", "observation"].forEach((group) => {

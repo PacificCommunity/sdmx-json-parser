@@ -107,6 +107,25 @@ test("ECB 1.0 root dialect is wrapped and reshaped to 2.0", () => {
   assert.ok(out.data.dataSets[0].series);
 });
 
+test("keyPosition is synthesised when the root dialect omits it", () => {
+  // ECB carries no keyPosition on any dimension; getData needs it to map
+  // observation-key positions to dimensions
+  const out = SDMXParser.normalizeSdmxJson(v1Root());
+  const dims = out.data.structures[0].dimensions;
+  assert.equal(dims.series[0].id, "FREQ");
+  assert.equal(dims.series[0].keyPosition, 0);
+  assert.equal(dims.observation[0].id, "TIME_PERIOD");
+  assert.equal(dims.observation[0].keyPosition, 1);
+});
+
+test("existing keyPosition values are preserved (idempotent)", () => {
+  const two = structureV2();
+  // 2.0 observation dim already carries keyPosition 0; must be kept
+  const out = SDMXParser.normalizeSdmxJson(v2());
+  assert.equal(out.data.structures[0].dimensions.observation[0].keyPosition, 0);
+  void two;
+});
+
 test("objects without SDMX markers are returned unchanged", () => {
   assert.deepEqual(SDMXParser.normalizeSdmxJson({ hello: 1 }), { hello: 1 });
   assert.equal(SDMXParser.normalizeSdmxJson(null), null);
