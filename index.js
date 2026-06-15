@@ -25,7 +25,12 @@ export class SDMXParser {
   parseSeriesInDatasets(txt) {
     let observations = {};
     try {
-      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*"]});
+      // Two locations: SDMX-JSON 2.0 and the .Stat-flavoured 1.0 carry
+      // dataSets inside a `data` envelope; the 1.0 root dialect (e.g. ECB)
+      // carries dataSets at the document root. parseSeriesInDatasets runs on
+      // the raw response text before the shape is normalised, so both paths
+      // are needed. A response matches only one.
+      const parser = new JSONParser({paths: ["$.data.dataSets.*.series.*", "$.dataSets.*.series.*"]});
       parser.onValue = function (jsonValue, key, parent, stack) {
         Object.keys(jsonValue.value.observations).forEach((obskey, i) => {
           observations[`${jsonValue.key}:${obskey}`] = jsonValue.value.observations[obskey];
@@ -48,15 +53,56 @@ export class SDMXParser {
    * This function gets api url in parameter and generates the SDMX-JSON dataSet from the api
    * If the response contains series, the series are expanded to observations
    * @param {String} api URL of the SDMX api
-   * @param {Object} Options Request options used while fetching (optional)
+   * @param {Object} options Request options used while fetching (optional).
+   *   The non-standard `fetcher` key accepts a function with the fetch
+   *   signature `(url, init) => Promise<Response>`; when present every request
+   *   goes through it (so consumers can add auth, proxying, caching, retries).
+   *   Remaining keys are passed to the request as its init object. A
+   *   caller-supplied `Accept` header disables the built-in negotiation below.
    * @return {Array} SDMX-JSON response
    */
   async getDatasets(api, options = {}) {
     try {
-      if (!api.endsWith(".json") && !api.includes("format=jsondata")) {
-        api = `${api}&format=jsondata`;
+      let url = api;
+      // append format=jsondata with the correct separator (the original code
+      // always used `&`, producing an invalid URL when there was no query)
+      if (!url.endsWith(".json") && !url.includes("format=jsondata")) {
+        url = `${url}${url.includes("?") ? "&" : "?"}format=jsondata`;
       }
-      const response = await fetch(api, options);
+      const { fetcher, ...init } = options;
+      const doFetch = fetcher || fetch;
+      const callerSetAccept = new Headers(init.headers || {}).has("Accept");
+      const requestWith = (accept) => {
+        const headers = new Headers(init.headers || {});
+        if (accept) headers.set("Accept", accept);
+        return doFetch(url, { ...init, headers });
+      };
+      const yieldsJson = (resp) => {
+        const ct = (resp.headers && typeof resp.headers.get === "function" && resp.headers.get("content-type")) || "";
+        return resp.status === 200 && ct.toLowerCase().includes("json");
+      };
+      // No single request serves SDMX-JSON from every provider (verified live
+      // across SPC/FBOS/SBS/ECB/OECD/ILO/ABS/UNICEF/BIS/IMF):
+      //  - most obey the `format=jsondata` query param and 406 the v1.0 JSON
+      //    media type;
+      //  - UNICEF and BIS only serve JSON for `Accept: ...;version=1.0.0`;
+      //  - ECB serves JSON for bare format=jsondata but 406s ANY SDMX-JSON
+      //    Accept header;
+      //  - IMF serves SDMX-JSON only for a generic `Accept: application/json`,
+      //    and returns XML (HTTP 200) to the other two — so the fallback must
+      //    key on the response being JSON, not merely on a non-200 status.
+      // Try each mechanism until one returns a 200 with a JSON content type.
+      // A caller-supplied Accept opts out (single request, caller in control).
+      const acceptSequence = callerSetAccept
+        ? [null]
+        : ["application/vnd.sdmx.data+json;version=1.0.0", null, "application/json"];
+      let response;
+      for (let i = 0; i < acceptSequence.length; i++) {
+        response = await requestWith(acceptSequence[i]);
+        if (callerSetAccept || yieldsJson(response) || i === acceptSequence.length - 1) {
+          break;
+        }
+      }
       if (response.status !== 200) {
         throw new Error(
           "Error while fetching data please provide valid api url"
@@ -64,7 +110,7 @@ export class SDMXParser {
       }
       const txt = await response.text();
       const seriesObservations = this.parseSeriesInDatasets(txt);
-      this.getJSON = JSON.parse(txt);
+      this.getJSON = this.normalizeShape(JSON.parse(txt));
       // if series are present in the response, replace the badly-parsed series with observations extracted by parseSeries
       if (Object.keys(seriesObservations).length > 0) {
         this.getJSON.data.dataSets[0].observations = seriesObservations;
@@ -74,6 +120,56 @@ export class SDMXParser {
       throw new Error(err);
     }
     return this.getJSON;
+  }
+
+  /**
+   * Reshape the two dialects the readers do not natively handle into the form
+   * getStructure()/getObservations()/getData() expect. Idempotent: responses
+   * already in the canonical shape pass through untouched.
+   * @param {Object} json parsed SDMX-JSON response
+   * @return {Object} the same object, reshaped in place
+   */
+  normalizeShape(json) {
+    if (!json || typeof json !== "object") {
+      return json;
+    }
+    // SDMX-JSON 1.0 root dialect (ECB): `structure` and `dataSets` sit at the
+    // document root with no `data` envelope. Wrap them so the readers, which
+    // look under `data`, work unchanged.
+    if (!json.data && (json.structure || json.dataSets)) {
+      json.data = {};
+      if (json.structure) {
+        json.data.structure = json.structure;
+        delete json.structure;
+      }
+      if (json.dataSets) {
+        json.data.dataSets = json.dataSets;
+        delete json.dataSets;
+      }
+    }
+    // Synthesise keyPosition when the response omits it (the ECB root dialect
+    // carries none). getData()/getActiveDimensions() locate a dimension by
+    // matching its keyPosition against the index in the (series-expanded)
+    // observation key; without it no dimension is attached to the parsed rows.
+    // Series dimensions fill the leading key positions, observation dimensions
+    // follow, which matches the seriesKey:obsKey layout. Only fill gaps, so
+    // responses that already carry keyPosition (2.0, .Stat) are untouched.
+    const structure = json.data && (
+      json.data.structure ||
+      (Array.isArray(json.data.structures) && json.data.structures[0])
+    );
+    if (structure && structure.dimensions) {
+      let keyPosition = 0;
+      ["series", "observation"].forEach((group) => {
+        (structure.dimensions[group] || []).forEach((dimension) => {
+          if (dimension.keyPosition === undefined) {
+            dimension.keyPosition = keyPosition;
+          }
+          keyPosition++;
+        });
+      });
+    }
+    return json;
   }
 
   /**
