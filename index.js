@@ -374,9 +374,20 @@ export class SDMXParser {
     let res = [];
     for (let key in observations) {
       const keyArray = key.split(":");
+      // Coerce a numeric observation value delivered as a JSON string (some
+      // providers, e.g. BIS, send OBS_VALUE as "2.41" rather than 2.41) to a
+      // number, so consumers (charts, value cards) receive plotting-ready
+      // numbers. Only non-empty numeric strings are converted; numbers, null
+      // (missing), and non-numeric markers (e.g. confidentiality codes) pass
+      // through unchanged so we never fabricate a 0 from null/"".
+      const rawValue = observations[key][0];
+      const value =
+        typeof rawValue === "string" && rawValue.trim() !== "" && Number.isFinite(Number(rawValue))
+          ? Number(rawValue)
+          : rawValue;
       // the keyto object will contain the value of the observation and the dimensions and attributes values with their name
       const keyto = {
-        value: observations[key][0],
+        value,
       };
 
       keyArray.forEach((_val, index) => {

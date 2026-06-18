@@ -149,6 +149,31 @@ test("appends format=jsondata with the right separator", async () => {
   assert.ok(seen[1].endsWith("&format=jsondata"));
 });
 
+test("coerces numeric string OBS_VALUE to a number; leaves null and non-numeric markers", async () => {
+  const fixture = () => ({
+    data: {
+      structures: [{
+        name: "F", names: { en: "F" },
+        dimensions: {
+          dataSet: [], series: [],
+          observation: [{ id: "TIME_PERIOD", name: "t", keyPosition: 0, values: [
+            { id: "2022", name: "2022" }, { id: "2023", name: "2023" }, { id: "2024", name: "2024" },
+          ] }],
+        },
+        attributes: { dataSet: [], dimensionGroup: [], series: [], observation: [] },
+      }],
+      dataSets: [{ observations: { "0": ["2.41"], "1": [null], "2": ["confidential"] } }],
+    },
+  });
+  const p = new SDMXParser();
+  await p.getDatasets("https://x/rest/data/A/all", { fetcher: async () => resp(200, fixture()) });
+  const byTime = Object.fromEntries(p.getData().map((r) => [r.TIME_PERIOD, r.value]));
+  assert.equal(byTime["2022"], 2.41);                 // numeric string -> number
+  assert.equal(typeof byTime["2022"], "number");
+  assert.equal(byTime["2023"], null);                 // null stays null (NOT 0)
+  assert.equal(byTime["2024"], "confidential");        // non-numeric marker untouched
+});
+
 // ---------------------------------------------------------------------------
 // end-to-end parse of each dialect
 // ---------------------------------------------------------------------------
