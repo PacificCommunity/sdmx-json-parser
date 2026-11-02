@@ -99,6 +99,17 @@ export class SDMXParser {
       let response;
       for (let i = 0; i < acceptSequence.length; i++) {
         response = await requestWith(acceptSequence[i]);
+        // SDMX REST: 404 means "no results" (.Stat Suite answers a text/plain
+        // `NoRecordsFound`). That is an empty result, not a format mismatch:
+        // stop negotiating and report it distinctly.
+        if (response.status === 404) {
+          const body = typeof response.text === "function" ? await response.text().catch(() => "") : "";
+          if (/NoRecordsFound|no records found|no results/i.test(body)) {
+            const err = new Error(`No records found for ${url}`);
+            err.code = "NO_RECORDS";
+            throw err;
+          }
+        }
         if (callerSetAccept || yieldsJson(response) || i === acceptSequence.length - 1) {
           break;
         }
@@ -117,6 +128,7 @@ export class SDMXParser {
         delete this.getJSON.data.dataSets[0].series;
       }
     } catch (err) {
+      if (err && err.code === "NO_RECORDS") throw err;
       throw new Error(err);
     }
     return this.getJSON;

@@ -193,3 +193,20 @@ for (const [name, fixture, expectName] of [
     assert.equal(data[0].TIME_PERIOD, "2024");
   });
 }
+
+test("404 NoRecordsFound throws NO_RECORDS and stops negotiation", async () => {
+  const { fetcher, calls } = recordingFetcher(() => resp(404, "NoRecordsFound", "text/plain"));
+  await assert.rejects(
+    new SDMXParser().getDatasets("https://x/rest/data/A/all", { fetcher }),
+    (err) => err.code === "NO_RECORDS" && err.message.startsWith("No records found"),
+  );
+  assert.equal(calls.length, 1);
+});
+
+test("404 with another body keeps the generic fetch error", async () => {
+  const { fetcher } = recordingFetcher(() => resp(404, "<html>Not Found</html>", "text/html"));
+  await assert.rejects(
+    new SDMXParser().getDatasets("https://x/rest/data/A/all", { fetcher }),
+    (err) => err.code === undefined && /Error while fetching data/.test(err.message),
+  );
+});
