@@ -5,14 +5,14 @@
   "main": "example.js",
   "type": "module",
   "scripts": {
-    "server": "cp -R ../dist . && serve .",
+    "server": "cp -R ../dist . && sirv . --port 3000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "serve": "^14.2.0"
+    "sirv-cli": "^3.0.1"
   },
   "devDependencies": {
     "source-map-loader": "^4.0.1"
